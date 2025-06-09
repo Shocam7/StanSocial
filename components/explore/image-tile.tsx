@@ -17,12 +17,12 @@ export function ImageTile({ post, layout, position }: ImageTileProps) {
   const badgePosition = position === "right" ? "top-2 right-2" : "top-2 left-2"
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer h-full">
       <div className="relative">
         <img
           src={post.image || "/placeholder.svg"}
           alt="Post content"
-          className={`w-full object-cover ${layout === "full" ? "h-96" : "h-64"}`}
+          className={`w-full object-cover ${layout === "full" ? "h-64 md:h-96" : "h-48 md:h-64"}`}
         />
 
         {/* Idol Badge */}
@@ -43,17 +43,17 @@ export function ImageTile({ post, layout, position }: ImageTileProps) {
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
             <div className="flex items-center justify-between text-white">
               <div className="flex items-center space-x-3">
-                <Button variant="ghost" size="sm" className="text-white hover:text-red-400">
+                <Button variant="ghost" size="sm" className="text-white hover:text-red-400 p-1 h-auto">
                   <Heart className="h-4 w-4 mr-1" />
-                  {post.likes}
+                  <span className="text-xs">{post.likes}</span>
                 </Button>
-                <Button variant="ghost" size="sm" className="text-white hover:text-blue-400">
+                <Button variant="ghost" size="sm" className="text-white hover:text-blue-400 p-1 h-auto">
                   <MessageCircle className="h-4 w-4 mr-1" />
-                  {post.comments}
+                  <span className="text-xs">{post.comments}</span>
                 </Button>
-                <Button variant="ghost" size="sm" className="text-white hover:text-green-400">
+                <Button variant="ghost" size="sm" className="text-white hover:text-green-400 p-1 h-auto">
                   <Repeat2 className="h-4 w-4 mr-1" />
-                  {post.reposts}
+                  <span className="text-xs">{post.reposts}</span>
                 </Button>
               </div>
             </div>

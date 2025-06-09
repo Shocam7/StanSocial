@@ -15,9 +15,9 @@ interface DiscussionTileProps {
 
 export function DiscussionTile({ post, layout, position }: DiscussionTileProps) {
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-4">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer h-full">
+      <CardContent className="p-4 md:p-6">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 mb-4">
           <div className="flex items-center space-x-3">
             <Avatar className="h-10 w-10">
               <AvatarImage src={post.user.avatar || "/placeholder.svg"} alt={post.user.name} />
@@ -41,7 +41,7 @@ export function DiscussionTile({ post, layout, position }: DiscussionTileProps) 
           </div>
         </div>
 
-        <h2 className="text-xl font-bold mb-3 line-clamp-2">{post.title}</h2>
+        <h2 className="text-lg md:text-xl font-bold mb-3 line-clamp-2">{post.title}</h2>
 
         {post.content && <p className="text-muted-foreground mb-4 line-clamp-3">{post.content}</p>}
 

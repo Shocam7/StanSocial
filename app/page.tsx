@@ -1,11 +1,8 @@
 "use client"
 
 import { AvatarFallback } from "@/components/ui/avatar"
-
 import { AvatarImage } from "@/components/ui/avatar"
-
 import { Avatar } from "@/components/ui/avatar"
-
 import { useState } from "react"
 import { Header } from "@/components/header"
 import { StannedIdolsSidebar } from "@/components/stanned-idols-sidebar"
@@ -159,13 +156,16 @@ export default function Home() {
   const discoverIdols = sampleIdols.filter((idol) => !idol.isStanned)
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
+      <Header stannedIdols={stannedIdols} />
 
-      <div className="container mx-auto flex">
-        <StannedIdolsSidebar stannedIdols={stannedIdols} />
+      <div className="container mx-auto flex flex-col md:flex-row">
+        {/* Sidebar - hidden on mobile, shown in sheet via header */}
+        <div className="hidden md:block">
+          <StannedIdolsSidebar stannedIdols={stannedIdols} />
+        </div>
 
-        <main className="flex-1 max-w-2xl border-x">
+        <main className="flex-1 max-w-full md:max-w-2xl border-x">
           <Tabs defaultValue="feed" className="w-full">
             <div className="sticky top-16 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
               <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
@@ -201,7 +201,7 @@ export default function Home() {
 
             <TabsContent value="discover" className="mt-0 p-4">
               <h2 className="text-xl font-bold mb-4">Discover New Idols to Stan</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {discoverIdols.map((idol) => (
                   <IdolCard key={idol.id} idol={idol} />
                 ))}
@@ -210,7 +210,8 @@ export default function Home() {
           </Tabs>
         </main>
 
-        <aside className="w-80 p-4 space-y-4">
+        {/* Right sidebar - hidden on mobile */}
+        <aside className="hidden lg:block w-80 p-4 space-y-4">
           <div className="bg-muted rounded-lg p-4">
             <h3 className="font-bold text-lg mb-3">Popular Posts</h3>
             <div className="space-y-3">

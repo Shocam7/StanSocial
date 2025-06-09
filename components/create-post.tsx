@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
 import { IdolSelector } from "@/components/idol-selector"
+import { createPost } from "@/app/actions"
+import { useToast } from "@/hooks/use-toast"
 import type { Idol } from "@/types"
 
 interface CreatePostProps {
@@ -17,6 +19,8 @@ interface CreatePostProps {
 export function CreatePost({ idols, userAvatar }: CreatePostProps) {
   const [content, setContent] = useState("")
   const [selectedIdol, setSelectedIdol] = useState<Idol | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { toast } = useToast()
   const maxLength = 280
 
   const handleSelectIdol = (idol: Idol) => {
@@ -24,6 +28,35 @@ export function CreatePost({ idols, userAvatar }: CreatePostProps) {
   }
 
   const isPostValid = content.trim().length > 0 && selectedIdol !== null
+
+  const handleSubmit = async () => {
+    if (!isPostValid) return
+
+    setIsSubmitting(true)
+
+    const formData = new FormData()
+    formData.append("content", content)
+    formData.append("idolId", selectedIdol!.id)
+
+    const result = await createPost(formData)
+
+    setIsSubmitting(false)
+
+    if (result.success) {
+      setContent("")
+      setSelectedIdol(null)
+      toast({
+        title: "Post created",
+        description: "Your post has been published successfully!",
+      })
+    } else {
+      toast({
+        title: "Error",
+        description: "Failed to create post. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
 
   return (
     <Card className="border-0 border-b rounded-none">
@@ -43,7 +76,7 @@ export function CreatePost({ idols, userAvatar }: CreatePostProps) {
               onChange={(e) => setContent(e.target.value)}
               className="min-h-[100px] resize-none text-lg focus-visible:ring-0"
               maxLength={maxLength}
-              disabled={!selectedIdol}
+              disabled={!selectedIdol || isSubmitting}
             />
 
             <div className="flex items-center justify-between">
@@ -68,8 +101,8 @@ export function CreatePost({ idols, userAvatar }: CreatePostProps) {
                 >
                   {maxLength - content.length}
                 </span>
-                <Button disabled={!isPostValid} className="rounded-full px-6">
-                  Post
+                <Button disabled={!isPostValid || isSubmitting} className="rounded-full px-6" onClick={handleSubmit}>
+                  {isSubmitting ? "Posting..." : "Post"}
                 </Button>
               </div>
             </div>

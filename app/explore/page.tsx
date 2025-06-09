@@ -1,222 +1,168 @@
-"use client"
-
+import { getSupabaseServer } from "@/lib/supabase"
 import { Header } from "@/components/header"
 import { StannedIdolsSidebar } from "@/components/stanned-idols-sidebar"
-import { ExploreLayout } from "@/components/explore/explore-layout"
+import { ExploreGrid } from "@/components/explore/explore-grid"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Filter } from "lucide-react"
 import type { Idol, ExplorePost } from "@/types"
 
-// Sample data
-const sampleIdols: Idol[] = [
-  {
-    id: "1",
-    name: "Taylor Swift",
-    image: "/placeholder.svg?height=48&width=48&text=TS",
-    category: "Music",
-    followers: 1200000,
-    isStanned: true,
-  },
-  {
-    id: "2",
-    name: "BTS",
-    image: "/placeholder.svg?height=48&width=48&text=BTS",
-    category: "K-Pop",
-    followers: 2500000,
-    isStanned: true,
-  },
-  {
-    id: "3",
-    name: "Zendaya",
-    image: "/placeholder.svg?height=48&width=48&text=Z",
-    category: "Acting",
-    followers: 980000,
-    isStanned: false,
-  },
-  {
-    id: "4",
-    name: "Ariana Grande",
-    image: "/placeholder.svg?height=48&width=48&text=AG",
-    category: "Music",
-    followers: 1500000,
-    isStanned: true,
-  },
-]
+// Function to get relative time
+function getRelativeTimeString(date: Date): string {
+  const now = new Date()
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
 
-const sampleExplorePosts: ExplorePost[] = [
-  {
-    id: "1",
-    type: "video",
-    trendingScore: 95,
-    user: { name: "Sarah Johnson", username: "sarahj_fan", avatar: "/placeholder.svg?height=32&width=32" },
-    idol: sampleIdols[0],
-    timestamp: "2h",
-    likes: 2450,
-    comments: 156,
-    reposts: 89,
-    video: "/placeholder.svg?height=400&width=600&text=Taylor+Concert+Video",
-    content: "Taylor's surprise acoustic performance last night was absolutely magical! 🎵✨",
-  },
-  {
-    id: "2",
-    type: "poll",
-    trendingScore: 88,
-    user: { name: "Alex Chen", username: "alexbtstan", avatar: "/placeholder.svg?height=32&width=32" },
-    idol: sampleIdols[1],
-    timestamp: "4h",
-    likes: 1890,
-    comments: 234,
-    reposts: 67,
-    pollQuestion: "Which BTS album is your all-time favorite?",
-    pollOptions: [
-      { id: "1", text: "Love Yourself: Tear", votes: 1250 },
-      { id: "2", text: "Map of the Soul: 7", votes: 980 },
-      { id: "3", text: "BE", votes: 756 },
-      { id: "4", text: "Wings", votes: 1100 },
-    ],
-    totalVotes: 4086,
-  },
-  {
-    id: "3",
-    type: "discussion",
-    trendingScore: 92,
-    user: { name: "Maria Rodriguez", username: "maria_discusses", avatar: "/placeholder.svg?height=32&width=32" },
-    idol: sampleIdols[0],
-    timestamp: "6h",
-    likes: 567,
-    comments: 89,
-    reposts: 23,
-    title: "Taylor Swift's songwriting evolution: From country roots to pop mastery",
-    content: "Let's discuss how Taylor's songwriting has evolved over the years...",
-  },
-  {
-    id: "4",
-    type: "image",
-    trendingScore: 85,
-    user: { name: "David Kim", username: "david_photographer", avatar: "/placeholder.svg?height=32&width=32" },
-    idol: sampleIdols[2],
-    timestamp: "8h",
-    likes: 1456,
-    comments: 78,
-    reposts: 45,
-    image: "/placeholder.svg?height=500&width=400&text=Zendaya+Photoshoot",
-    content: "Behind the scenes from Zendaya's latest photoshoot 📸",
-  },
-  {
-    id: "5",
-    type: "image",
-    trendingScore: 82,
-    user: { name: "Emma Wilson", username: "emma_captures", avatar: "/placeholder.svg?height=32&width=32" },
-    idol: sampleIdols[3],
-    timestamp: "10h",
-    likes: 1234,
-    comments: 56,
-    reposts: 34,
-    image: "/placeholder.svg?height=600&width=400&text=Ariana+Concert",
-    content: "Ariana's vocals were absolutely incredible tonight! 🎤",
-  },
-  {
-    id: "6",
-    type: "video",
-    trendingScore: 78,
-    user: { name: "Chris Park", username: "chris_edits", avatar: "/placeholder.svg?height=32&width=32" },
-    idol: sampleIdols[1],
-    timestamp: "12h",
-    likes: 2100,
-    comments: 145,
-    reposts: 78,
-    video: "/placeholder.svg?height=400&width=600&text=BTS+Dance+Practice",
-    content: "BTS dance practice compilation - their synchronization is unreal! 💜",
-  },
-  {
-    id: "7",
-    type: "poll",
-    trendingScore: 75,
-    user: { name: "Lisa Thompson", username: "lisa_polls", avatar: "/placeholder.svg?height=32&width=32" },
-    idol: sampleIdols[3],
-    timestamp: "14h",
-    likes: 890,
-    comments: 67,
-    reposts: 23,
-    pollQuestion: "What's your favorite Ariana Grande era?",
-    pollOptions: [
-      { id: "1", text: "Sweetener Era", votes: 450 },
-      { id: "2", text: "Thank U, Next Era", votes: 680 },
-      { id: "3", text: "Positions Era", votes: 320 },
-      { id: "4", text: "Eternal Sunshine Era", votes: 290 },
-    ],
-    totalVotes: 1740,
-  },
-  {
-    id: "8",
-    type: "discussion",
-    trendingScore: 70,
-    user: { name: "Jordan Lee", username: "jordan_talks", avatar: "/placeholder.svg?height=32&width=32" },
-    idol: sampleIdols[2],
-    timestamp: "16h",
-    likes: 445,
-    comments: 123,
-    reposts: 34,
-    title: "Zendaya's impact on young actors and representation in Hollywood",
-    content: "How has Zendaya changed the landscape for young actors...",
-  },
-]
+  if (diffInSeconds < 60) return `${diffInSeconds}s`
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`
+  return `${Math.floor(diffInSeconds / 86400)}d`
+}
 
-export default function ExplorePage() {
-  const stannedIdols = sampleIdols.filter((idol) => idol.isStanned)
+export default async function ExplorePage() {
+  const supabase = getSupabaseServer()
+
+  // Fetch stanned idols (in a real app, this would be for the current user)
+  const { data: stannedIdolsData } = await supabase
+    .from("user_stanned_idols")
+    .select("idol_id")
+    .eq("user_id", "00000000-0000-0000-0000-000000000001")
+
+  const stannedIdolIds = stannedIdolsData?.map((item) => item.idol_id) || []
+
+  // Fetch all idols
+  const { data: idolsData } = await supabase.from("idols").select("*")
+
+  const idols: Idol[] =
+    idolsData?.map((idol) => ({
+      id: idol.id,
+      name: idol.name,
+      image: idol.image,
+      category: idol.category,
+      followers: idol.followers,
+      isStanned: stannedIdolIds.includes(idol.id),
+    })) || []
+
+  const stannedIdols = idols.filter((idol) => idol.isStanned)
+
+  // Fetch posts with related data
+  const { data: postsData } = await supabase.from("posts").select("*").order("trending_score", { ascending: false })
+
+  // Transform posts data
+  const explorePosts: ExplorePost[] = await Promise.all(
+    (postsData || []).map(async (post) => {
+      // Fetch user data
+      const { data: userData } = await supabase.from("users").select("*").eq("id", post.user_id).single()
+
+      // Fetch idol data
+      const { data: idolData } = await supabase.from("idols").select("*").eq("id", post.idol_id).single()
+
+      // For poll posts, fetch options
+      let pollOptions = undefined
+      let totalVotes = undefined
+
+      if (post.type === "poll") {
+        const { data: options } = await supabase.from("poll_options").select("*").eq("post_id", post.id)
+
+        if (options) {
+          pollOptions = options.map((option) => ({
+            id: option.id,
+            text: option.text,
+            votes: option.votes,
+          }))
+
+          totalVotes = options.reduce((sum, option) => sum + option.votes, 0)
+        }
+      }
+
+      const user = userData
+        ? {
+            name: userData.name,
+            username: userData.username,
+            avatar: userData.avatar,
+          }
+        : { name: "Unknown User", username: "unknown", avatar: "" }
+
+      const idol = idolData
+        ? {
+            id: idolData.id,
+            name: idolData.name,
+            image: idolData.image,
+            category: idolData.category,
+            followers: idolData.followers,
+            isStanned: stannedIdolIds.includes(idolData.id),
+          }
+        : { id: "", name: "Unknown Idol", image: "", category: "", followers: 0, isStanned: false }
+
+      return {
+        id: post.id,
+        type: post.type,
+        trendingScore: post.trending_score,
+        user,
+        idol,
+        timestamp: getRelativeTimeString(new Date(post.created_at)),
+        likes: post.likes,
+        comments: post.comments,
+        reposts: post.reposts,
+        content: post.content || undefined,
+        image: post.image || undefined,
+        video: post.video || undefined,
+        title: post.title || undefined,
+        pollQuestion: post.poll_question || undefined,
+        pollOptions,
+        totalVotes,
+      }
+    }),
+  )
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
+      <Header stannedIdols={stannedIdols} />
 
-      <div className="container mx-auto flex">
-        <StannedIdolsSidebar stannedIdols={stannedIdols} />
+      <div className="container mx-auto flex flex-col md:flex-row">
+        {/* Sidebar - hidden on mobile, shown in sheet via header */}
+        <div className="hidden md:block">
+          <StannedIdolsSidebar stannedIdols={stannedIdols} />
+        </div>
 
-        <main className="flex-1 max-w-6xl border-x">
+        <main className="flex-1 max-w-full md:max-w-6xl border-x">
           <div className="sticky top-16 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b p-4">
-            <h1 className="text-2xl font-bold">Explore</h1>
-            <p className="text-muted-foreground">Discover trending content about your favorite idols</p>
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-2xl font-bold">Explore</h1>
+              <Button variant="outline" size="sm">
+                <Filter className="h-4 w-4 mr-2" />
+                Filter
+              </Button>
+            </div>
+            <Tabs defaultValue="trending">
+              <TabsList className="w-full md:w-auto">
+                <TabsTrigger value="trending">Trending</TabsTrigger>
+                <TabsTrigger value="images">Images</TabsTrigger>
+                <TabsTrigger value="videos">Videos</TabsTrigger>
+                <TabsTrigger value="polls">Polls</TabsTrigger>
+                <TabsTrigger value="discussions">Discussions</TabsTrigger>
+              </TabsList>
+              <TabsContent value="trending" className="mt-0">
+                <ExploreGrid posts={explorePosts} />
+              </TabsContent>
+              <TabsContent value="images" className="mt-0">
+                <ExploreGrid posts={explorePosts.filter((post) => post.type === "image")} />
+              </TabsContent>
+              <TabsContent value="videos" className="mt-0">
+                <ExploreGrid posts={explorePosts.filter((post) => post.type === "video")} />
+              </TabsContent>
+              <TabsContent value="polls" className="mt-0">
+                <ExploreGrid posts={explorePosts.filter((post) => post.type === "poll")} />
+              </TabsContent>
+              <TabsContent value="discussions" className="mt-0">
+                <ExploreGrid posts={explorePosts.filter((post) => post.type === "discussion")} />
+              </TabsContent>
+            </Tabs>
           </div>
 
-          <ExploreLayout posts={sampleExplorePosts} />
+          <div className="p-4">
+            <p className="text-muted-foreground mb-6">Discover trending content about your favorite idols</p>
+          </div>
         </main>
-
-        <aside className="w-80 p-4 space-y-4">
-          <div className="bg-muted rounded-lg p-4">
-            <h3 className="font-bold text-lg mb-3">Trending Categories</h3>
-            <div className="space-y-2">
-              {[
-                { category: "Music", posts: "2.5K posts", trend: "+15%" },
-                { category: "K-Pop", posts: "1.8K posts", trend: "+23%" },
-                { category: "Acting", posts: "890 posts", trend: "+8%" },
-              ].map((item, index) => (
-                <div key={index} className="flex justify-between items-center p-2 hover:bg-background rounded">
-                  <div>
-                    <p className="font-medium">{item.category}</p>
-                    <p className="text-xs text-muted-foreground">{item.posts}</p>
-                  </div>
-                  <span className="text-xs text-green-600 font-medium">{item.trend}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-muted rounded-lg p-4">
-            <h3 className="font-bold text-lg mb-3">Post Types</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { type: "Images", count: "1.2K", icon: "🖼️" },
-                { type: "Videos", count: "856", icon: "🎥" },
-                { type: "Polls", count: "234", icon: "📊" },
-                { type: "Discussions", count: "445", icon: "💬" },
-              ].map((item, index) => (
-                <div key={index} className="text-center p-3 bg-background rounded">
-                  <div className="text-2xl mb-1">{item.icon}</div>
-                  <p className="font-medium text-sm">{item.type}</p>
-                  <p className="text-xs text-muted-foreground">{item.count}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </aside>
       </div>
     </div>
   )

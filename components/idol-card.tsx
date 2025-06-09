@@ -4,6 +4,8 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { toggleStanIdol } from "@/app/actions"
+import { useToast } from "@/hooks/use-toast"
 import type { Idol } from "@/types"
 import Link from "next/link"
 
@@ -14,10 +16,32 @@ interface IdolCardProps {
 export function IdolCard({ idol }: IdolCardProps) {
   const [isStanned, setIsStanned] = useState(idol.isStanned || false)
   const [followers, setFollowers] = useState(idol.followers)
+  const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
 
-  const toggleStan = () => {
+  const toggleStan = async () => {
+    setIsLoading(true)
+
+    // Update UI optimistically
     setIsStanned(!isStanned)
     setFollowers(isStanned ? followers - 1 : followers + 1)
+
+    // Send to server
+    const result = await toggleStanIdol(idol.id, isStanned)
+
+    setIsLoading(false)
+
+    if (!result.success) {
+      // Revert on failure
+      setIsStanned(isStanned)
+      setFollowers(idol.followers)
+
+      toast({
+        title: "Error",
+        description: "Failed to update stan status. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -54,9 +78,10 @@ export function IdolCard({ idol }: IdolCardProps) {
               e.preventDefault()
               toggleStan()
             }}
+            disabled={isLoading}
             className={isStanned ? "bg-primary" : ""}
           >
-            {isStanned ? "Stanning" : "Stan"}
+            {isLoading ? "..." : isStanned ? "Stanning" : "Stan"}
           </Button>
         </div>
       </CardContent>
