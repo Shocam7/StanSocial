@@ -7,11 +7,11 @@ import type { Idol } from "@/types"
 import Link from "next/link"
 
 const navigationItems = [
-  { icon: Home, label: "Home", active: true },
-  { icon: Search, label: "Search" },
-  { icon: Compass, label: "Discover Idols" },
-  { icon: Star, label: "Popular" },
-  { icon: Settings, label: "Settings" },
+  { icon: Home, label: "Home", active: true, href: "/" },
+  { icon: Search, label: "Explore", active: false, href: "/explore" },
+  { icon: Compass, label: "Discover Idols", active: false, href: "/" },
+  { icon: Star, label: "Popular", active: false, href: "/" },
+  { icon: Settings, label: "Settings", active: false, href: "/" },
 ]
 
 interface StannedIdolsSidebarProps {
@@ -23,15 +23,12 @@ export function StannedIdolsSidebar({ stannedIdols }: StannedIdolsSidebarProps) 
     <aside className="w-64 p-4 space-y-6">
       <nav className="space-y-2">
         {navigationItems.map((item) => (
-          <Button
-            key={item.label}
-            variant={item.active ? "default" : "ghost"}
-            className="w-full justify-start"
-            size="lg"
-          >
-            <item.icon className="mr-3 h-5 w-5" />
-            {item.label}
-          </Button>
+          <Link key={item.label} href={item.href}>
+            <Button variant={item.active ? "default" : "ghost"} className="w-full justify-start" size="lg">
+              <item.icon className="mr-3 h-5 w-5" />
+              {item.label}
+            </Button>
+          </Link>
         ))}
       </nav>
 

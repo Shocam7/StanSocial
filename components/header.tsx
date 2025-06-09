@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import Link from "next/link"
 
 export function Header() {
   return (
@@ -21,9 +22,11 @@ export function Header() {
         </div>
 
         <nav className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon">
-            <Home className="h-5 w-5" />
-          </Button>
+          <Link href="/">
+            <Button variant="ghost" size="icon">
+              <Home className="h-5 w-5" />
+            </Button>
+          </Link>
           <Button variant="ghost" size="icon">
             <MessageCircle className="h-5 w-5" />
           </Button>
