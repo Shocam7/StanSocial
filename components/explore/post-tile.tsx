@@ -8,7 +8,7 @@ import type { ExplorePost } from "@/types"
 
 interface PostTileProps {
   post: ExplorePost
-  layout: "full" | "half"
+  layout: "full" | "half" | "third"
   position: "left" | "right" | "center"
 }
 

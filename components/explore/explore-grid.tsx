@@ -2,110 +2,161 @@
 
 import { PostTile } from "./post-tile"
 import type { ExplorePost } from "@/types"
-import { useEffect, useState } from "react"
 
 interface ExploreGridProps {
   posts: ExplorePost[]
 }
 
+interface PostGroup {
+  posts: ExplorePost[]
+  averageScore: number
+}
+
 export function ExploreGrid({ posts }: ExploreGridProps) {
-  // Sort posts by trending score
+  // Sort posts by trending score (descending)
   const sortedPosts = [...posts].sort((a, b) => b.trendingScore - a.trendingScore)
-  const [columns, setColumns] = useState(2)
 
-  // Responsive column count
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 640) {
-        setColumns(1)
-      } else if (window.innerWidth < 1024) {
-        setColumns(2)
+  // Group posts with similar trending scores (difference ≤ 10)
+  const groupPosts = (): PostGroup[] => {
+    if (sortedPosts.length === 0) return []
+
+    const groups: PostGroup[] = []
+    let currentGroup: ExplorePost[] = [sortedPosts[0]]
+
+    for (let i = 1; i < sortedPosts.length; i++) {
+      const currentPost = sortedPosts[i]
+      const lastPostInGroup = currentGroup[currentGroup.length - 1]
+
+      // Check if the current post should be in the same group
+      if (Math.abs(lastPostInGroup.trendingScore - currentPost.trendingScore) <= 10) {
+        currentGroup.push(currentPost)
       } else {
-        setColumns(3)
+        // Finalize current group and start a new one
+        groups.push({
+          posts: currentGroup,
+          averageScore: currentGroup.reduce((sum, post) => sum + post.trendingScore, 0) / currentGroup.length,
+        })
+        currentGroup = [currentPost]
       }
     }
 
-    handleResize()
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
-
-  // Organize posts into a grid layout
-  const organizeGrid = () => {
-    // Always put the most trending post at the top with full width
-    const topPost = sortedPosts[0]
-    const remainingPosts = sortedPosts.slice(1)
-
-    // Group discussion posts (they always take full width)
-    const discussionPosts = remainingPosts.filter((post) => post.type === "discussion")
-
-    // Other posts that can be arranged in a grid
-    const gridPosts = remainingPosts.filter((post) => post.type !== "discussion")
-
-    // Group posts with similar trending scores
-    const groupedPosts: ExplorePost[][] = []
-    let i = 0
-
-    while (i < gridPosts.length) {
-      const currentPost = gridPosts[i]
-
-      // Check if we can pair this post with the next one based on trending score
-      if (i + 1 < gridPosts.length && Math.abs(currentPost.trendingScore - gridPosts[i + 1].trendingScore) <= 10) {
-        // Similar trending scores, group them
-        groupedPosts.push([currentPost, gridPosts[i + 1]])
-        i += 2
-      } else {
-        // Significant trending margin, keep it alone
-        groupedPosts.push([currentPost])
-        i += 1
-      }
+    // Add the last group
+    if (currentGroup.length > 0) {
+      groups.push({
+        posts: currentGroup,
+        averageScore: currentGroup.reduce((sum, post) => sum + post.trendingScore, 0) / currentGroup.length,
+      })
     }
 
-    return { topPost, discussionPosts, groupedPosts }
+    return groups
   }
 
-  const { topPost, discussionPosts, groupedPosts } = organizeGrid()
+  const postGroups = groupPosts()
 
-  if (!topPost) return <div className="p-4 text-center">No posts to display</div>
+  const renderGroup = (group: PostGroup, groupIndex: number) => {
+    const { posts } = group
+
+    // Discussion posts always take full width
+    const discussionPosts = posts.filter((post) => post.type === "discussion")
+    const nonDiscussionPosts = posts.filter((post) => post.type !== "discussion")
+
+    const elements: JSX.Element[] = []
+
+    // Render discussion posts first (full width)
+    discussionPosts.forEach((post, index) => {
+      elements.push(
+        <div key={`discussion-${post.id}`} className="col-span-full">
+          <PostTile post={post} layout="full" position="center" />
+        </div>,
+      )
+    })
+
+    // Handle non-discussion posts
+    if (nonDiscussionPosts.length === 1) {
+      // Single post takes full width
+      elements.push(
+        <div key={`single-${nonDiscussionPosts[0].id}`} className="col-span-full">
+          <PostTile post={nonDiscussionPosts[0]} layout="full" position="center" />
+        </div>,
+      )
+    } else if (nonDiscussionPosts.length === 2) {
+      // Two posts in same line
+      elements.push(
+        <div key={`pair-${groupIndex}`} className="col-span-full grid grid-cols-2 gap-4">
+          <PostTile post={nonDiscussionPosts[0]} layout="half" position="left" />
+          <PostTile post={nonDiscussionPosts[1]} layout="half" position="right" />
+        </div>,
+      )
+    } else if (nonDiscussionPosts.length === 3) {
+      // Three posts in same line
+      elements.push(
+        <div key={`triple-${groupIndex}`} className="col-span-full grid grid-cols-3 gap-4">
+          <PostTile post={nonDiscussionPosts[0]} layout="third" position="left" />
+          <PostTile post={nonDiscussionPosts[1]} layout="third" position="center" />
+          <PostTile post={nonDiscussionPosts[2]} layout="third" position="right" />
+        </div>,
+      )
+    } else if (nonDiscussionPosts.length > 3) {
+      // More than 3 posts: first 3 in one line, rest in subsequent lines
+      const firstThree = nonDiscussionPosts.slice(0, 3)
+      const remaining = nonDiscussionPosts.slice(3)
+
+      // First line with 3 posts
+      elements.push(
+        <div key={`first-three-${groupIndex}`} className="col-span-full grid grid-cols-3 gap-4">
+          <PostTile post={firstThree[0]} layout="third" position="left" />
+          <PostTile post={firstThree[1]} layout="third" position="center" />
+          <PostTile post={firstThree[2]} layout="third" position="right" />
+        </div>,
+      )
+
+      // Handle remaining posts in groups of 3, 2, or 1
+      let remainingIndex = 0
+      while (remainingIndex < remaining.length) {
+        const chunk = remaining.slice(remainingIndex, remainingIndex + 3)
+
+        if (chunk.length === 1) {
+          elements.push(
+            <div key={`remaining-single-${remainingIndex}`} className="col-span-full">
+              <PostTile post={chunk[0]} layout="full" position="center" />
+            </div>,
+          )
+        } else if (chunk.length === 2) {
+          elements.push(
+            <div key={`remaining-pair-${remainingIndex}`} className="col-span-full grid grid-cols-2 gap-4">
+              <PostTile post={chunk[0]} layout="half" position="left" />
+              <PostTile post={chunk[1]} layout="half" position="right" />
+            </div>,
+          )
+        } else if (chunk.length === 3) {
+          elements.push(
+            <div key={`remaining-triple-${remainingIndex}`} className="col-span-full grid grid-cols-3 gap-4">
+              <PostTile post={chunk[0]} layout="third" position="left" />
+              <PostTile post={chunk[1]} layout="third" position="center" />
+              <PostTile post={chunk[2]} layout="third" position="right" />
+            </div>,
+          )
+        }
+
+        remainingIndex += 3
+      }
+    }
+
+    return elements
+  }
+
+  if (sortedPosts.length === 0) {
+    return (
+      <div className="p-8 text-center">
+        <h3 className="font-semibold text-lg mb-2">No posts to display</h3>
+        <p className="text-muted-foreground">Check back later for trending content!</p>
+      </div>
+    )
+  }
 
   return (
-    <div className="grid gap-4">
-      {/* Top trending post - full width */}
-      <div className="col-span-full">
-        <PostTile post={topPost} layout="full" position="center" />
-      </div>
-
-      {/* Grid layout for remaining posts */}
-      <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4`}>
-        {groupedPosts.map((group, groupIndex) => {
-          // For single posts in a group
-          if (group.length === 1) {
-            return (
-              <div
-                key={group[0].id}
-                className={columns === 1 ? "col-span-1" : "col-span-1 sm:col-span-2 lg:col-span-1"}
-              >
-                <PostTile post={group[0]} layout={columns === 1 ? "full" : "half"} position="center" />
-              </div>
-            )
-          }
-
-          // For pairs of posts with similar trending scores
-          return (
-            <div key={`group-${groupIndex}`} className="col-span-1 sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <PostTile post={group[0]} layout="half" position="left" />
-              <PostTile post={group[1]} layout="half" position="right" />
-            </div>
-          )
-        })}
-
-        {/* Discussion posts - always full width */}
-        {discussionPosts.map((post) => (
-          <div key={post.id} className="col-span-1 sm:col-span-2 lg:col-span-3">
-            <PostTile post={post} layout="full" position="center" />
-          </div>
-        ))}
-      </div>
+    <div className="grid grid-cols-1 gap-6 p-4">
+      {postGroups.map((group, groupIndex) => renderGroup(group, groupIndex))}
     </div>
   )
 }

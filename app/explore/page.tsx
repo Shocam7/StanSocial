@@ -1,10 +1,10 @@
 import { getSupabaseServer } from "@/lib/supabase"
 import { Header } from "@/components/header"
-import { StannedIdolsSidebar } from "@/components/stanned-idols-sidebar"
 import { ExploreGrid } from "@/components/explore/explore-grid"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Filter } from "lucide-react"
+import { FloatingNavButton } from "@/components/floating-nav-button"
 import type { Idol, ExplorePost } from "@/types"
 
 // Function to get relative time
@@ -116,23 +116,23 @@ export default async function ExplorePage() {
 
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
+      <FloatingNavButton />
       <Header stannedIdols={stannedIdols} />
 
       <div className="container mx-auto flex flex-col md:flex-row">
-        {/* Sidebar - hidden on mobile, shown in sheet via header */}
-        <div className="hidden md:block">
-          <StannedIdolsSidebar stannedIdols={stannedIdols} />
-        </div>
-
-        <main className="flex-1 max-w-full md:max-w-6xl border-x">
-          <div className="sticky top-16 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h1 className="text-2xl font-bold">Explore</h1>
+        <main className="flex-1 max-w-full md:max-w-4xl border-x">
+          <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="text-2xl font-bold">Explore</h1>
+                <p className="text-muted-foreground text-sm">Discover trending content about your favorite idols</p>
+              </div>
               <Button variant="outline" size="sm">
                 <Filter className="h-4 w-4 mr-2" />
                 Filter
               </Button>
             </div>
+
             <Tabs defaultValue="trending">
               <TabsList className="w-full md:w-auto">
                 <TabsTrigger value="trending">Trending</TabsTrigger>
@@ -141,6 +141,7 @@ export default async function ExplorePage() {
                 <TabsTrigger value="polls">Polls</TabsTrigger>
                 <TabsTrigger value="discussions">Discussions</TabsTrigger>
               </TabsList>
+
               <TabsContent value="trending" className="mt-0">
                 <ExploreGrid posts={explorePosts} />
               </TabsContent>
@@ -158,11 +159,47 @@ export default async function ExplorePage() {
               </TabsContent>
             </Tabs>
           </div>
-
-          <div className="p-4">
-            <p className="text-muted-foreground mb-6">Discover trending content about your favorite idols</p>
-          </div>
         </main>
+
+        {/* Right sidebar - hidden on mobile and tablet */}
+        <aside className="hidden xl:block w-80 p-4 space-y-4">
+          <div className="bg-muted rounded-lg p-4">
+            <h3 className="font-bold text-lg mb-3">Trending Categories</h3>
+            <div className="space-y-2">
+              {[
+                { category: "Music", posts: "2.5K posts", trend: "+15%" },
+                { category: "K-Pop", posts: "1.8K posts", trend: "+23%" },
+                { category: "Acting", posts: "890 posts", trend: "+8%" },
+              ].map((item, index) => (
+                <div key={index} className="flex justify-between items-center p-2 hover:bg-background rounded">
+                  <div>
+                    <p className="font-medium">{item.category}</p>
+                    <p className="text-xs text-muted-foreground">{item.posts}</p>
+                  </div>
+                  <span className="text-xs text-green-600 font-medium">{item.trend}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-muted rounded-lg p-4">
+            <h3 className="font-bold text-lg mb-3">Post Types</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { type: "Images", count: "1.2K", icon: "🖼️" },
+                { type: "Videos", count: "856", icon: "🎥" },
+                { type: "Polls", count: "234", icon: "📊" },
+                { type: "Discussions", count: "445", icon: "💬" },
+              ].map((item, index) => (
+                <div key={index} className="text-center p-3 bg-background rounded">
+                  <div className="text-2xl mb-1">{item.icon}</div>
+                  <p className="font-medium text-sm">{item.type}</p>
+                  <p className="text-xs text-muted-foreground">{item.count}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   )

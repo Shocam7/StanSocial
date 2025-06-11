@@ -25,7 +25,7 @@ export function IdolProfileHeader({ idol }: IdolProfileHeaderProps) {
   return (
     <div className="border-x">
       {/* Header with back button */}
-      <div className="sticky top-16 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b p-4">
+      <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b p-4">
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-5 w-5" />

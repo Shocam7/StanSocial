@@ -5,11 +5,10 @@ import { AvatarImage } from "@/components/ui/avatar"
 import { Avatar } from "@/components/ui/avatar"
 import { useState } from "react"
 import { Header } from "@/components/header"
-import { StannedIdolsSidebar } from "@/components/stanned-idols-sidebar"
-import { CreatePost } from "@/components/create-post"
 import { Post } from "@/components/post"
 import { IdolCard } from "@/components/idol-card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { FloatingNavButton } from "@/components/floating-nav-button"
 import type { Idol, Post as PostType } from "@/types"
 
 // Sample data
@@ -157,18 +156,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
+      <FloatingNavButton />
       <Header stannedIdols={stannedIdols} />
 
       <div className="container mx-auto flex flex-col md:flex-row">
-        {/* Sidebar - hidden on mobile, shown in sheet via header */}
-        <div className="hidden md:block">
-          <StannedIdolsSidebar stannedIdols={stannedIdols} />
-        </div>
-
-        <main className="flex-1 max-w-full md:max-w-2xl border-x">
+        <main className="flex-1 max-w-full md:max-w-4xl border-x">
           <Tabs defaultValue="feed" className="w-full">
-            <div className="sticky top-16 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-              <TabsList className="w-full justify-start rounded-none border-b bg-transparent p-0">
+            <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+              <TabsList className="w-full justify-start rounded-none bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/40 p-0">
                 <TabsTrigger
                   value="feed"
                   className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-primary"
@@ -176,17 +171,15 @@ export default function Home() {
                   My Feed
                 </TabsTrigger>
                 <TabsTrigger
-                  value="discover"
+                  value="new-for-you"
                   className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-primary"
                 >
-                  Discover Idols
+                  New For You
                 </TabsTrigger>
               </TabsList>
             </div>
 
             <TabsContent value="feed" className="mt-0">
-              <CreatePost idols={stannedIdols} userAvatar="/placeholder.svg?height=40&width=40" />
-
               <div className="divide-y">
                 {feedPosts.length > 0 ? (
                   feedPosts.map((post) => <Post key={post.id} {...post} />)
@@ -199,12 +192,36 @@ export default function Home() {
               </div>
             </TabsContent>
 
-            <TabsContent value="discover" className="mt-0 p-4">
-              <h2 className="text-xl font-bold mb-4">Discover New Idols to Stan</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {discoverIdols.map((idol) => (
-                  <IdolCard key={idol.id} idol={idol} />
-                ))}
+            <TabsContent value="new-for-you" className="mt-0 p-4">
+              <h2 className="text-xl font-bold mb-4">New For You</h2>
+              <p className="text-muted-foreground mb-6">Personalized content based on your interests and activity</p>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-semibold mb-3">Recommended Idols</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {discoverIdols.slice(0, 2).map((idol) => (
+                      <IdolCard key={idol.id} idol={idol} />
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-3">Trending in Your Categories</h3>
+                  <div className="space-y-3">
+                    {samplePosts.slice(0, 2).map((post) => (
+                      <div key={post.id} className="p-3 border rounded-lg">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Avatar className="h-6 w-6">
+                            <AvatarImage src={post.idol.image || "/placeholder.svg"} alt={post.idol.name} />
+                            <AvatarFallback>{post.idol.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium text-sm">{post.idol.name}</span>
+                          <span className="text-xs text-muted-foreground">• {post.timestamp}</span>
+                        </div>
+                        <p className="text-sm line-clamp-2">{post.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </TabsContent>
           </Tabs>

@@ -8,6 +8,7 @@ import { IdolProfileHeader } from "@/components/idol-profile-header"
 import { IdolStats } from "@/components/idol-stats"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { Idol, Post as PostType } from "@/types"
+import { FloatingNavButton } from "@/components/floating-nav-button"
 
 // Sample data (in a real app, this would come from an API)
 const sampleIdols: Idol[] = [
@@ -167,6 +168,7 @@ export default async function IdolPage({ params }: IdolPageProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      <FloatingNavButton />
       <Header />
 
       <div className="container mx-auto flex">

@@ -13,7 +13,7 @@ import type { ExplorePost } from "@/types"
 
 interface PollTileProps {
   post: ExplorePost
-  layout: "full" | "half"
+  layout: "full" | "half" | "third"
   position: "left" | "right" | "center"
 }
 
@@ -90,10 +90,10 @@ export function PollTile({ post, layout, position }: PollTileProps) {
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer h-full">
-      <CardContent className="p-4 md:p-6 relative">
+      <CardContent className={`${layout === "third" ? "p-3" : "p-4 md:p-6"} relative`}>
         {/* Idol Badge */}
         <div className={`absolute ${badgePosition} z-10`}>
-          <Avatar className="h-8 w-8 ring-2 ring-white">
+          <Avatar className={`${layout === "third" ? "h-6 w-6" : "h-8 w-8"} ring-2 ring-white`}>
             <AvatarImage src={post.idol.image || "/placeholder.svg"} alt={post.idol.name} />
             <AvatarFallback className="text-xs">{post.idol.name.charAt(0)}</AvatarFallback>
           </Avatar>
@@ -101,35 +101,41 @@ export function PollTile({ post, layout, position }: PollTileProps) {
 
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <Avatar className="h-8 w-8">
+            <Avatar className={layout === "third" ? "h-6 w-6" : "h-8 w-8"}>
               <AvatarImage src={post.user.avatar || "/placeholder.svg"} alt={post.user.name} />
               <AvatarFallback className="text-xs">{post.user.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-medium text-sm">{post.user.name}</p>
-              <p className="text-xs text-muted-foreground">{post.timestamp}</p>
+              <p className={`font-medium ${layout === "third" ? "text-xs" : "text-sm"}`}>{post.user.name}</p>
+              <p className={`text-muted-foreground ${layout === "third" ? "text-xs" : "text-xs"}`}>{post.timestamp}</p>
             </div>
           </div>
 
           <div className="flex items-center space-x-2">
-            <Badge className="bg-blue-100 text-blue-800">📊 Poll</Badge>
-            <Badge variant="secondary">🔥 {post.trendingScore}</Badge>
+            <Badge className={`bg-blue-100 text-blue-800 ${layout === "third" ? "text-xs" : ""}`}>📊 Poll</Badge>
+            <Badge variant="secondary" className={layout === "third" ? "text-xs" : ""}>
+              🔥 {post.trendingScore}
+            </Badge>
           </div>
         </div>
 
-        <h3 className="font-bold text-lg mb-4">{post.pollQuestion}</h3>
+        <h3 className={`font-bold mb-4 ${layout === "third" ? "text-sm" : "text-lg"}`}>{post.pollQuestion}</h3>
 
         <div className="space-y-3 mb-4">
           {pollOptions.map((option) => (
             <div key={option.id} className="space-y-2">
               <Button
                 variant={selectedOption === option.id ? "default" : "outline"}
-                className="w-full justify-start text-left h-auto p-3"
+                className={`w-full justify-start text-left h-auto ${layout === "third" ? "p-2 text-xs" : "p-3"}`}
                 onClick={() => handleVote(option.id)}
                 disabled={hasVoted}
               >
                 <span className="flex-1">{option.text}</span>
-                {hasVoted && <span className="text-sm font-medium">{getPercentage(option.votes)}%</span>}
+                {hasVoted && (
+                  <span className={`font-medium ${layout === "third" ? "text-xs" : "text-sm"}`}>
+                    {getPercentage(option.votes)}%
+                  </span>
+                )}
               </Button>
 
               {hasVoted && <Progress value={getPercentage(option.votes)} className="h-2" />}
@@ -142,17 +148,27 @@ export function PollTile({ post, layout, position }: PollTileProps) {
             <Button
               variant="ghost"
               size="sm"
-              className={`${isLiked ? "text-red-600" : "text-muted-foreground"} hover:text-red-600`}
+              className={`${isLiked ? "text-red-600" : "text-muted-foreground"} hover:text-red-600 ${
+                layout === "third" ? "text-xs" : ""
+              }`}
               onClick={handleLike}
             >
               <Heart className={`h-4 w-4 mr-1 ${isLiked ? "fill-current" : ""}`} />
               {likes}
             </Button>
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-blue-600">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`text-muted-foreground hover:text-blue-600 ${layout === "third" ? "text-xs" : ""}`}
+            >
               <MessageCircle className="h-4 w-4 mr-1" />
               {post.comments}
             </Button>
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-green-600">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`text-muted-foreground hover:text-green-600 ${layout === "third" ? "text-xs" : ""}`}
+            >
               <Repeat2 className="h-4 w-4 mr-1" />
               {post.reposts}
             </Button>
@@ -160,7 +176,7 @@ export function PollTile({ post, layout, position }: PollTileProps) {
 
           <div className="flex items-center space-x-1 text-muted-foreground">
             <Users className="h-4 w-4" />
-            <span className="text-sm">{totalVotes.toLocaleString()} votes</span>
+            <span className={layout === "third" ? "text-xs" : "text-sm"}>{totalVotes.toLocaleString()} votes</span>
           </div>
         </div>
       </CardContent>
