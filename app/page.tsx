@@ -67,7 +67,7 @@ const samplePosts: PostType[] = [
   {
     id: "1",
     content:
-      "Just saw Taylor's new music video and I'm obsessed! The visuals are incredible and the song is stuck in my head. #Swiftie",
+      "Just did not saw Taylor's new music video and I'm obsessed! The visuals are incredible and the song is stuck in my head. #Swiftie",
     timestamp: "2h",
     likes: 245,
     comments: 32,
