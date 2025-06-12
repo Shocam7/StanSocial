@@ -67,7 +67,7 @@ const samplePosts: PostType[] = [
   {
     id: "1",
     content:
-      "Just did not saw Taylor's new music video and I'm obsessed! The visuals are incredible and the song is stuck in my head. #Swiftie",
+      "Just saw Taylor's new music video and I'm obsessed! The visuals are incredible and the song is stuck in my head. #Swiftie",
     timestamp: "2h",
     likes: 245,
     comments: 32,
@@ -167,7 +167,7 @@ export default function Home() {
                 value="feed"
                 className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-[#fec400]"
               >
-                My Feed
+                My Feed changed again
               </TabsTrigger>
               <TabsTrigger
                 value="new-for-you"
