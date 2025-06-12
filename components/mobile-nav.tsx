@@ -13,7 +13,7 @@ export function MobileNav() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t border-border/40">
+    <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t border-[#fec400]/40">
       <div className="flex items-center justify-around px-2 py-3">
         <Link href="/">
           <Button
@@ -36,7 +36,7 @@ export function MobileNav() {
           </Button>
         </Link>
         <div className="flex flex-col items-center gap-1 py-2 px-3">
-          <div className="text-xl font-black text-foreground tracking-tight">stan</div>
+          <div className="text-xl font-black text-[#fec400] tracking-tight">stan</div>
         </div>
         <Button variant="ghost" size="icon" className="rounded-full flex flex-col items-center gap-1 h-auto py-2 px-3">
           <Plus className="h-5 w-5" />

@@ -120,14 +120,18 @@ export default async function ExplorePage() {
       <Header stannedIdols={stannedIdols} />
 
       <div className="container mx-auto flex flex-col md:flex-row">
-        <main className="flex-1 max-w-full md:max-w-4xl border-x">
-          <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b p-4">
+        <main className="flex-1 max-w-full md:max-w-4xl border-x border-[#fec400]/20">
+          <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-[#fec400]/40 p-4">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className="text-2xl font-bold">Explore</h1>
                 <p className="text-muted-foreground text-sm">Discover trending content about your favorite idols</p>
               </div>
-              <Button variant="outline" size="sm">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-[#fec400] text-[#fec400] hover:bg-[#fec400] hover:text-black"
+              >
                 <Filter className="h-4 w-4 mr-2" />
                 Filter
               </Button>
@@ -163,7 +167,7 @@ export default async function ExplorePage() {
 
         {/* Right sidebar - hidden on mobile and tablet */}
         <aside className="hidden xl:block w-80 p-4 space-y-4">
-          <div className="bg-muted rounded-lg p-4">
+          <div className="bg-muted rounded-lg p-4 border border-[#fec400]/20">
             <h3 className="font-bold text-lg mb-3">Trending Categories</h3>
             <div className="space-y-2">
               {[
@@ -171,7 +175,10 @@ export default async function ExplorePage() {
                 { category: "K-Pop", posts: "1.8K posts", trend: "+23%" },
                 { category: "Acting", posts: "890 posts", trend: "+8%" },
               ].map((item, index) => (
-                <div key={index} className="flex justify-between items-center p-2 hover:bg-background rounded">
+                <div
+                  key={index}
+                  className="flex justify-between items-center p-2 hover:bg-background rounded border border-transparent hover:border-[#fec400]/20"
+                >
                   <div>
                     <p className="font-medium">{item.category}</p>
                     <p className="text-xs text-muted-foreground">{item.posts}</p>
@@ -182,7 +189,7 @@ export default async function ExplorePage() {
             </div>
           </div>
 
-          <div className="bg-muted rounded-lg p-4">
+          <div className="bg-muted rounded-lg p-4 border border-[#fec400]/20">
             <h3 className="font-bold text-lg mb-3">Post Types</h3>
             <div className="grid grid-cols-2 gap-2">
               {[
@@ -191,7 +198,7 @@ export default async function ExplorePage() {
                 { type: "Polls", count: "234", icon: "📊" },
                 { type: "Discussions", count: "445", icon: "💬" },
               ].map((item, index) => (
-                <div key={index} className="text-center p-3 bg-background rounded">
+                <div key={index} className="text-center p-3 bg-background rounded border border-[#fec400]/20">
                   <div className="text-2xl mb-1">{item.icon}</div>
                   <p className="font-medium text-sm">{item.type}</p>
                   <p className="text-xs text-muted-foreground">{item.count}</p>

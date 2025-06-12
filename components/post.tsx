@@ -10,7 +10,7 @@ import Link from "next/link"
 
 export function Post({ user, content, image, timestamp, likes, comments, reposts, liked = false, idol }: PostType) {
   return (
-    <Card className="border-0 border-b rounded-none">
+    <Card className="border-0 border-b border-[#fec400]/20 rounded-none">
       <CardContent className="p-4 relative">
         {/* Main content area with right padding to avoid overlap with avatar */}
         <div className="space-y-2">
@@ -26,7 +26,7 @@ export function Post({ user, content, image, timestamp, likes, comments, reposts
               </div>
             </div>
             <Link href={`/idol/${idol.id}`} className="hover:opacity-80 transition-opacity">
-              <Avatar className="h-12 w-12 ring-2 ring-primary">
+              <Avatar className="h-12 w-12 ring-2 ring-[#fec400]">
                 <AvatarImage src={idol.image || "/placeholder.svg"} alt={idol.name} />
                 <AvatarFallback>{idol.name.charAt(0)}</AvatarFallback>
               </Avatar>
@@ -37,7 +37,7 @@ export function Post({ user, content, image, timestamp, likes, comments, reposts
           <span className="text-muted-foreground text-xs">{timestamp}</span>
 
           {image && (
-            <div className="rounded-lg overflow-hidden border">
+            <div className="rounded-lg overflow-hidden border border-[#fec400]/30">
               <img src={image || "/placeholder.svg"} alt="Post image" className="w-full h-64 object-cover" />
             </div>
           )}

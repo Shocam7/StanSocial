@@ -20,7 +20,7 @@ export function FloatingNavButton() {
   }
 
   return (
-    <div className="fixed top-4 left-4 z-50">
+    <div className="fixed top-4 left-4 z-[9999]">
       <Button
         size="icon"
         className="h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground"

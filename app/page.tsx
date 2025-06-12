@@ -160,27 +160,25 @@ export default function Home() {
       <Header stannedIdols={stannedIdols} />
 
       <div className="container mx-auto flex flex-col md:flex-row">
-        <main className="flex-1 max-w-full md:max-w-4xl border-x">
+        <main className="flex-1 max-w-full md:max-w-4xl border-x border-[#fec400]/20">
           <Tabs defaultValue="feed" className="w-full">
-            <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-              <TabsList className="w-full justify-start rounded-none bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/40 p-0">
-                <TabsTrigger
-                  value="feed"
-                  className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-primary"
-                >
-                  My Feed
-                </TabsTrigger>
-                <TabsTrigger
-                  value="new-for-you"
-                  className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-primary"
-                >
-                  New For You
-                </TabsTrigger>
-              </TabsList>
-            </div>
+            <TabsList className="fixed top-0 left-0 z-[9998] w-full justify-end rounded-none bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-[#fec400]/40 p-0">
+              <TabsTrigger
+                value="feed"
+                className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-[#fec400]"
+              >
+                My Feed
+              </TabsTrigger>
+              <TabsTrigger
+                value="new-for-you"
+                className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-[#fec400]"
+              >
+                New For You
+              </TabsTrigger>
+            </TabsList>
 
-            <TabsContent value="feed" className="mt-0">
-              <div className="divide-y">
+            <TabsContent value="feed" className="mt-0 pt-16">
+              <div className="divide-y divide-[#fec400]/10">
                 {feedPosts.length > 0 ? (
                   feedPosts.map((post) => <Post key={post.id} {...post} />)
                 ) : (
@@ -192,36 +190,37 @@ export default function Home() {
               </div>
             </TabsContent>
 
-            <TabsContent value="new-for-you" className="mt-0 p-4">
-              <h2 className="text-xl font-bold mb-4">New For You</h2>
-              <p className="text-muted-foreground mb-6">Personalized content based on your interests and activity</p>
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-semibold mb-3">Recommended Idols</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {discoverIdols.slice(0, 2).map((idol) => (
-                      <IdolCard key={idol.id} idol={idol} />
-                    ))}
+            <TabsContent value="new-for-you" className="mt-0 pt-16">
+              <div className="p-4">
+                <h2 className="text-xl font-bold mb-4">Personalized For You</h2>
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Recommended Idols</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {discoverIdols.slice(0, 2).map((idol) => (
+                        <IdolCard key={idol.id} idol={idol} />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Trending Content</h3>
+                    <div className="divide-y divide-[#fec400]/10">
+                      {samplePosts.slice(0, 3).map((post) => (
+                        <Post key={post.id} {...post} />
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold mb-3">Trending in Your Categories</h3>
-                  <div className="space-y-3">
-                    {samplePosts.slice(0, 2).map((post) => (
-                      <div key={post.id} className="p-3 border rounded-lg">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <Avatar className="h-6 w-6">
-                            <AvatarImage src={post.idol.image || "/placeholder.svg"} alt={post.idol.name} />
-                            <AvatarFallback>{post.idol.name.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <span className="font-medium text-sm">{post.idol.name}</span>
-                          <span className="text-xs text-muted-foreground">• {post.timestamp}</span>
-                        </div>
-                        <p className="text-sm line-clamp-2">{post.content}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="discover" className="mt-0 p-4 pt-16">
+              <h2 className="text-xl font-bold mb-4">Discover New Idols to Stan</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {discoverIdols.map((idol) => (
+                  <IdolCard key={idol.id} idol={idol} />
+                ))}
               </div>
             </TabsContent>
           </Tabs>
@@ -229,11 +228,11 @@ export default function Home() {
 
         {/* Right sidebar - hidden on mobile */}
         <aside className="hidden lg:block w-80 p-4 space-y-4">
-          <div className="bg-muted rounded-lg p-4">
+          <div className="bg-muted rounded-lg p-4 border border-[#fec400]/20">
             <h3 className="font-bold text-lg mb-3">Popular Posts</h3>
             <div className="space-y-3">
               {samplePosts.slice(0, 3).map((post, index) => (
-                <div key={index} className="border-b pb-3 last:border-0 last:pb-0">
+                <div key={index} className="border-b border-[#fec400]/10 pb-3 last:border-0 last:pb-0">
                   <div className="flex items-center space-x-2 mb-1">
                     <Avatar className="h-6 w-6">
                       <AvatarImage src={post.idol.image || "/placeholder.svg"} alt={post.idol.name} />
@@ -252,7 +251,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="bg-muted rounded-lg p-4">
+          <div className="bg-muted rounded-lg p-4 border border-[#fec400]/20">
             <h3 className="font-bold text-lg mb-3">Trending Topics</h3>
             <div className="space-y-2">
               {[
@@ -261,7 +260,10 @@ export default function Home() {
                 { tag: "#ArianaNewAlbum", posts: "8.7K posts" },
                 { tag: "#KpopAwards", posts: "23.1K posts" },
               ].map((trend, index) => (
-                <div key={index} className="cursor-pointer hover:bg-background rounded p-2 -m-2">
+                <div
+                  key={index}
+                  className="cursor-pointer hover:bg-background rounded p-2 -m-2 border border-transparent hover:border-[#fec400]/20"
+                >
                   <p className="font-medium">{trend.tag}</p>
                   <p className="text-muted-foreground text-xs">{trend.posts}</p>
                 </div>

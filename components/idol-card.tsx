@@ -45,12 +45,12 @@ export function IdolCard({ idol }: IdolCardProps) {
   }
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow border border-[#fec400]/20">
       <Link href={`/idol/${idol.id}`}>
         <div className="h-32 bg-gradient-to-r from-primary/20 to-primary/40" />
         <CardContent className="pt-0 relative">
           <div className="absolute -top-12 left-4">
-            <Avatar className="h-24 w-24 border-4 border-background">
+            <Avatar className="h-24 w-24 border-4 border-background ring-2 ring-[#fec400]">
               <AvatarImage src={idol.image || "/placeholder.svg"} alt={idol.name} />
               <AvatarFallback className="text-2xl">{idol.name.charAt(0)}</AvatarFallback>
             </Avatar>
@@ -79,7 +79,11 @@ export function IdolCard({ idol }: IdolCardProps) {
               toggleStan()
             }}
             disabled={isLoading}
-            className={isStanned ? "bg-primary" : ""}
+            className={
+              isStanned
+                ? "bg-[#fec400] hover:bg-[#fec400]/90 border-[#fec400] text-white"
+                : "border-black text-black hover:bg-[#fec400] hover:text-white hover:border-[#fec400]"
+            }
           >
             {isLoading ? "..." : isStanned ? "Stanning" : "Stan"}
           </Button>
