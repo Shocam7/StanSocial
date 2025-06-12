@@ -167,7 +167,7 @@ export default function Home() {
                 value="feed"
                 className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-[#fec400]"
               >
-                My Feed
+                My Feed and so it is
               </TabsTrigger>
               <TabsTrigger
                 value="new-for-you"
