@@ -17,8 +17,8 @@ export function MobileNav() {
       <div className="flex items-center justify-around px-2 py-3">
         <Link href="/">
           <Button
-            variant={isActive("/") ? "default" : "ghost"}
-            size="icon"
+            variant={isActive("/") ? "menuicon" : "ghost"}
+            size="menuicon"
             className="flex flex-col items-center gap-1 h-auto py-2 px-3"
           >
             <Home className="h-5 w-5" />
@@ -27,8 +27,8 @@ export function MobileNav() {
         </Link>
         <Link href="/explore">
           <Button
-            variant={isActive("/explore") ? "default" : "ghost"}
-            size="icon"
+            variant={isActive("/explore") ? "menuicon" : "ghost"}
+            size="menuicon"
             className="flex flex-col items-center gap-1 h-auto py-2 px-3"
           >
             <Search className="h-5 w-5" />
@@ -36,13 +36,13 @@ export function MobileNav() {
           </Button>
         </Link>
         <div className="flex flex-col items-center gap-1 py-2 px-3">
-          <div className="text-xl font-black text-[#fec400] tracking-tight">stan</div>
+          <div className="text-xl font-black text-black tracking-tight">Stan</div>
         </div>
-        <Button variant="ghost" size="icon" className="rounded-full flex flex-col items-center gap-1 h-auto py-2 px-3">
+        <Button variant="ghost" size="menuicon" className="rounded-full flex flex-col items-center gap-1 h-auto py-2 px-3">
           <Plus className="h-5 w-5" />
           <span className="text-xs">Create</span>
         </Button>
-        <Button variant="ghost" size="icon" className="flex flex-col items-center gap-1 h-auto py-2 px-3">
+        <Button variant="ghost" size="menuicon" className="flex flex-col items-center gap-1 h-auto py-2 px-3">
           <User className="h-5 w-5" />
           <span className="text-xs">Profile</span>
         </Button>
