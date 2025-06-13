@@ -34,13 +34,15 @@ export function Post({ user, content, image, timestamp, likes, comments, reposts
           </div>
 
           <p className="text-sm leading-relaxed">{content}</p>
-          <span className="text-muted-foreground text-xs">{timestamp}</span>
-
+          
           {image && (
             <div className="rounded-lg overflow-hidden border border-[#fec400]/30">
               <img src={image || "/placeholder.svg"} alt="Post image" className="w-full h-64 object-cover" />
             </div>
           )}
+
+          <span className="text-muted-foreground text-xs">{timestamp}</span>
+          
 
           <div className="flex items-center justify-between pt-2">
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-blue-600">
