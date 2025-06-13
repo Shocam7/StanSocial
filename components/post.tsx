@@ -26,7 +26,7 @@ export function Post({ user, content, image, timestamp, likes, comments, reposts
               </div>
             </div>
             <Link href={`/idol/${idol.id}`} className="hover:opacity-80 transition-opacity">
-              <Avatar className="h-12 w-12 ring-2 ring-[#fec400]">
+              <Avatar className="h-12 w-12 ring-1 ring-[#fec400]">
                 <AvatarImage src={idol.image || "/placeholder.svg"} alt={idol.name} />
                 <AvatarFallback>{idol.name.charAt(0)}</AvatarFallback>
               </Avatar>
