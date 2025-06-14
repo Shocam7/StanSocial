@@ -83,7 +83,7 @@ const samplePosts: PostType[] = [
   {
     id: "2",
     content:
-      "BTS just announced their world tour! Who's trying to get tickets? I'm already saving up for the VIP experience! 💜",
+      "BeeTeeES just announced their world tour! Who's trying to get tickets? I'm already saving up for the VIP experience! 💜",
     image: "/placeholder.svg?height=300&width=500&text=BTS+World+Tour",
     timestamp: "4h",
     likes: 1024,
