@@ -19,6 +19,7 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         menuicon: "flex flex-col items-center gap-1 rounded-xl px-5 py-3 bg-[#fec400] text-black",
+        stanicon: "flex flex-col items-center gap-1 rounded-xl px-5 py-3 bg-black text-white",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -26,6 +27,7 @@ const buttonVariants = cva(
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
         menuicon: "h-auto w-auto min-w-12",
+        stanicon: "h-auto w-auto min-w-15"
       },
     },
     defaultVariants: {
