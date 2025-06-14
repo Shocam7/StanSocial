@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button"
 import { toggleLikePost } from "@/app/actions"
 import { useToast } from "@/hooks/use-toast"
 import { useState } from "react"
-import type { ExplorePost } from "@/types"
+import type { DiscoverPost } from "@/types"
 
 interface ImageTileProps {
-  post: ExplorePost
+  post: DiscoverPost
   layout: "full" | "half" | "third"
   position: "left" | "right" | "center"
 }

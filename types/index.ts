@@ -32,7 +32,7 @@ export interface Post {
   idol: Idol
 }
 
-export interface ExplorePost {
+export interface DiscoverPost {
   id: string
   type: "image" | "video" | "discussion" | "poll"
   trendingScore: number

@@ -86,7 +86,7 @@ export async function toggleLikePost(postId: string, isLiked: boolean) {
       .eq("id", postId)
 
     revalidatePath("/")
-    revalidatePath("/explore")
+    revalidatePath("/discover")
     revalidatePath("/idol/[id]")
     return { success: true }
   } catch (error) {
@@ -117,7 +117,7 @@ export async function voteInPoll(optionId: string) {
         .eq("id", data.post_id)
     }
 
-    revalidatePath("/explore")
+    revalidatePath("/discover")
     return { success: true }
   } catch (error) {
     console.error("Error voting in poll:", error)

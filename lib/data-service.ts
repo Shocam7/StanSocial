@@ -1,8 +1,8 @@
 import { getSupabaseBrowser } from "./supabase"
-import type { ExplorePost } from "@/types"
+import type { DiscoverPost } from "@/types"
 
 // Convert database post to app post
-const mapDatabasePostToAppPost = async (post: any): Promise<ExplorePost> => {
+const mapDatabasePostToAppPost = async (post: any): Promise<DiscoverPost> => {
   const supabase = getSupabaseBrowser()
 
   // Fetch the user

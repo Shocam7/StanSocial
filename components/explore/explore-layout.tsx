@@ -1,13 +1,13 @@
 "use client"
 
 import { PostTile } from "./post-tile"
-import type { ExplorePost } from "@/types"
+import type { DiscoverPost } from "@/types"
 
-interface ExploreLayoutProps {
-  posts: ExplorePost[]
+interface DiscoverLayoutProps {
+  posts: DiscoverPost[]
 }
 
-export function ExploreLayout({ posts }: ExploreLayoutProps) {
+export function DiscoverLayout({ posts }: DiscoverLayoutProps) {
   // Sort posts by trending score
   const sortedPosts = [...posts].sort((a, b) => b.trendingScore - a.trendingScore)
 

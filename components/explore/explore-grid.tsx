@@ -1,18 +1,18 @@
 "use client"
 
 import { PostTile } from "./post-tile"
-import type { ExplorePost } from "@/types"
+import type { DiscoverPost } from "@/types"
 
-interface ExploreGridProps {
-  posts: ExplorePost[]
+interface DiscoverGridProps {
+  posts: DiscoverPost[]
 }
 
 interface PostGroup {
-  posts: ExplorePost[]
+  posts: DiscoverPost[]
   averageScore: number
 }
 
-export function ExploreGrid({ posts }: ExploreGridProps) {
+export function DiscoverGrid({ posts }: DiscoverGridProps) {
   // Sort posts by trending score (descending)
   const sortedPosts = [...posts].sort((a, b) => b.trendingScore - a.trendingScore)
 
@@ -21,7 +21,7 @@ export function ExploreGrid({ posts }: ExploreGridProps) {
     if (sortedPosts.length === 0) return []
 
     const groups: PostGroup[] = []
-    let currentGroup: ExplorePost[] = [sortedPosts[0]]
+    let currentGroup: DiscoverPost[] = [sortedPosts[0]]
 
     for (let i = 1; i < sortedPosts.length; i++) {
       const currentPost = sortedPosts[i]

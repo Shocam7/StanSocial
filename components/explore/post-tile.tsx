@@ -4,10 +4,10 @@ import { ImageTile } from "./image-tile"
 import { VideoTile } from "./video-tile"
 import { DiscussionTile } from "./discussion-tile"
 import { PollTile } from "./poll-tile"
-import type { ExplorePost } from "@/types"
+import type { DiscoverPost } from "@/types"
 
 interface PostTileProps {
-  post: ExplorePost
+  post: DiscoverPost
   layout: "full" | "half" | "third"
   position: "left" | "right" | "center"
 }

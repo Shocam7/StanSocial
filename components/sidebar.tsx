@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 
 const navigationItems = [
   { icon: Home, label: "Home", active: true },
-  { icon: Search, label: "Explore" },
+  { icon: Search, label: "Discover" },
   { icon: Bell, label: "Notifications" },
   { icon: Mail, label: "Messages" },
   { icon: Bookmark, label: "Bookmarks" },

@@ -1,11 +1,11 @@
 import { getSupabaseServer } from "@/lib/supabase"
 import { Header } from "@/components/header"
-import { ExploreGrid } from "@/components/explore/explore-grid"
+import { DiscoverGrid } from "@/components/discover/discover-grid"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Filter } from "lucide-react"
 import { FloatingNavButton } from "@/components/floating-nav-button"
-import type { Idol, ExplorePost } from "@/types"
+import type { Idol, DiscoverPost } from "@/types"
 
 // Function to get relative time
 function getRelativeTimeString(date: Date): string {
@@ -18,7 +18,7 @@ function getRelativeTimeString(date: Date): string {
   return `${Math.floor(diffInSeconds / 86400)}d`
 }
 
-export default async function ExplorePage() {
+export default async function DiscoverPage() {
   const supabase = getSupabaseServer()
 
   // Fetch stanned idols (in a real app, this would be for the current user)
@@ -48,7 +48,7 @@ export default async function ExplorePage() {
   const { data: postsData } = await supabase.from("posts").select("*").order("trending_score", { ascending: false })
 
   // Transform posts data
-  const explorePosts: ExplorePost[] = await Promise.all(
+  const discoverPosts: DiscoverPost[] = await Promise.all(
     (postsData || []).map(async (post) => {
       // Fetch user data
       const { data: userData } = await supabase.from("users").select("*").eq("id", post.user_id).single()
@@ -124,7 +124,7 @@ export default async function ExplorePage() {
           <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-[#fec400]/40 p-4">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h1 className="text-2xl font-bold">Explore</h1>
+                <h1 className="text-2xl font-bold">Discover</h1>
                 <p className="text-muted-foreground text-sm">Discover trending content about your favorite idols</p>
               </div>
               <Button
@@ -147,19 +147,19 @@ export default async function ExplorePage() {
               </TabsList>
 
               <TabsContent value="trending" className="mt-0">
-                <ExploreGrid posts={explorePosts} />
+                <DiscoverGrid posts={discoverPosts} />
               </TabsContent>
               <TabsContent value="images" className="mt-0">
-                <ExploreGrid posts={explorePosts.filter((post) => post.type === "image")} />
+                <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "image")} />
               </TabsContent>
               <TabsContent value="videos" className="mt-0">
-                <ExploreGrid posts={explorePosts.filter((post) => post.type === "video")} />
+                <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "video")} />
               </TabsContent>
               <TabsContent value="polls" className="mt-0">
-                <ExploreGrid posts={explorePosts.filter((post) => post.type === "poll")} />
+                <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "poll")} />
               </TabsContent>
               <TabsContent value="discussions" className="mt-0">
-                <ExploreGrid posts={explorePosts.filter((post) => post.type === "discussion")} />
+                <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "discussion")} />
               </TabsContent>
             </Tabs>
           </div>

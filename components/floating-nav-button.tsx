@@ -10,7 +10,7 @@ export function FloatingNavButton() {
   const getPageIcon = () => {
     if (pathname === "/") {
       return <Home className="h-6 w-6" />
-    } else if (pathname === "/explore") {
+    } else if (pathname === "/discover") {
       return <Search className="h-6 w-6" />
     } else if (pathname.startsWith("/idol/")) {
       return <User className="h-6 w-6" />

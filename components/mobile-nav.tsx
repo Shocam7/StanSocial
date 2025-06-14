@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, Search, Plus, User } from "lucide-react"
+import { Home, Search, Plus, User, Compass } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -25,14 +25,14 @@ export function MobileNav() {
             <span className="text-xs">Home</span>
           </Button>
         </Link>
-        <Link href="/explore">
+        <Link href="/discover">
           <Button
-            variant={isActive("/explore") ? "menuicon" : "ghost"}
+            variant={isActive("/discover") ? "menuicon" : "ghost"}
             size="menuicon"
             className="flex flex-col items-center gap-1 h-auto py-2 px-3"
           >
-            <Search className="h-5 w-5" />
-            <span className="text-xs">Explore</span>
+            <Compass className="h-5 w-5" />
+            <span className="text-xs">Discover</span>
           </Button>
         </Link>
         <div className="flex flex-col items-center gap-1 py-2 px-3">

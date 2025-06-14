@@ -9,10 +9,10 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { voteInPoll, toggleLikePost } from "@/app/actions"
 import { useToast } from "@/hooks/use-toast"
-import type { ExplorePost } from "@/types"
+import type { DiscoverPost } from "@/types"
 
 interface PollTileProps {
-  post: ExplorePost
+  post: DiscoverPost
   layout: "full" | "half" | "third"
   position: "left" | "right" | "center"
 }

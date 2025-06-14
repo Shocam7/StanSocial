@@ -8,7 +8,7 @@ import Link from "next/link"
 
 const navigationItems = [
   { icon: Home, label: "Home", active: true, href: "/" },
-  { icon: Search, label: "Explore", active: false, href: "/explore" },
+  { icon: Search, label: "Discover", active: false, href: "/discover" },
   { icon: Compass, label: "Discover Idols", active: false, href: "/" },
   { icon: Star, label: "Popular", active: false, href: "/" },
   { icon: Settings, label: "Settings", active: false, href: "/" },
