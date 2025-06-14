@@ -34,10 +34,22 @@ export function MobileNav() {
             <Compass className="h-5 w-5" />
             <span className="text-xs">Discover</span>
           </Button>
+          
         </Link>
-        <div className="flex flex-col items-center gap-1 py-2 px-3">
-          <div className="text-xl font-black text-black tracking-tight">Stan</div>
-        </div>
+        <Link href="/">
+          <Button
+            variant={isActive("/") ? "stanicon" : "ghost"}
+            size="stanicon"
+            className="flex flex-col items-center gap-1 h-auto py-2 px-3"
+          >
+            <div className="flex flex-col items-center gap-1 py-2 px-3">
+              <span className="text-xl font-black tracking-tight">
+                Stan
+              </span>
+            </div>
+          </Button>
+        </Link>
+        
         <Button variant="ghost" size="menuicon" className="rounded-full flex flex-col items-center gap-1 h-auto py-2 px-3">
           <Plus className="h-5 w-5" />
           <span className="text-xs">Create</span>
