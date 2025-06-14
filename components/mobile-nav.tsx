@@ -34,7 +34,6 @@ export function MobileNav() {
             <Compass className="h-5 w-5" />
             <span className="text-xs">Discover</span>
           </Button>
-          
         </Link>
         <Link href="/">
           <Button
@@ -49,15 +48,26 @@ export function MobileNav() {
             </div>
           </Button>
         </Link>
-        
-        <Button variant="ghost" size="menuicon" className="rounded-full flex flex-col items-center gap-1 h-auto py-2 px-3">
-          <Plus className="h-5 w-5" />
-          <span className="text-xs">Create</span>
-        </Button>
-        <Button variant="ghost" size="menuicon" className="flex flex-col items-center gap-1 h-auto py-2 px-3">
-          <User className="h-5 w-5" />
-          <span className="text-xs">Profile</span>
-        </Button>
+        <Link href="/create">
+          <Button 
+            variant={isActive("/create") ? "menuicon" : "ghost"} 
+            size="menuicon" 
+            className="flex flex-col items-center gap-1 h-auto py-2 px-3"
+          >
+            <Plus className="h-5 w-5" />
+            <span className="text-xs">Create</span>
+          </Button>
+        </Link>
+        <Link href="/profile">
+          <Button 
+            variant={isActive("/profile") ? "menuicon" : "ghost"} 
+            size="menuicon" 
+            className="flex flex-col items-center gap-1 h-auto py-2 px-3"
+          >
+            <User className="h-5 w-5" />
+            <span className="text-xs">Profile</span>
+          </Button>
+        </Link>
       </div>
     </div>
   )
