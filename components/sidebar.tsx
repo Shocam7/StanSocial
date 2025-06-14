@@ -10,7 +10,7 @@ const navigationItems = [
   { icon: Bell, label: "Notifications" },
   { icon: Mail, label: "Messages" },
   { icon: Bookmark, label: "Bookmarks" },
-  { icon: User, label: "Profile" },
+  { icon: User, label: "Me" },
   { icon: Settings, label: "Settings" },
 ]
 

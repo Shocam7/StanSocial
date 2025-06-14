@@ -58,14 +58,14 @@ export function MobileNav() {
             <span className="text-xs">Create</span>
           </Button>
         </Link>
-        <Link href="/profile">
+        <Link href="/me">
           <Button 
-            variant={isActive("/profile") ? "menuicon" : "ghost"} 
+            variant={isActive("/me") ? "menuicon" : "ghost"} 
             size="menuicon" 
             className="flex flex-col items-center gap-1 h-auto py-2 px-3"
           >
             <User className="h-5 w-5" />
-            <span className="text-xs">Profile</span>
+            <span className="text-xs">Me</span>
           </Button>
         </Link>
       </div>
