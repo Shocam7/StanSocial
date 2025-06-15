@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, Search, Plus, User, Compass } from "lucide-react"
+import { Clock, Plus, User, Compass } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -15,16 +15,6 @@ export function MobileNav() {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t border-[#fec400]/40">
       <div className="flex items-center justify-around px-2 py-3">
-        <Link href="/">
-          <Button
-            variant={isActive("/") ? "menuicon" : "ghost"}
-            size="menuicon"
-            className="flex flex-col items-center gap-1 h-auto py-2 px-3"
-          >
-            <Home className="h-5 w-5" />
-            <span className="text-xs">Home</span>
-          </Button>
-        </Link>
         <Link href="/discover">
           <Button
             variant={isActive("/discover") ? "menuicon" : "ghost"}
@@ -33,6 +23,16 @@ export function MobileNav() {
           >
             <Compass className="h-5 w-5" />
             <span className="text-xs">Discover</span>
+          </Button>
+        </Link>
+        <Link href="/create">
+          <Button 
+            variant={isActive("/create") ? "menuicon" : "ghost"} 
+            size="menuicon" 
+            className="flex flex-col items-center gap-1 h-auto py-2 px-3"
+          >
+            <Plus className="h-5 w-5" />
+            <span className="text-xs">Create</span>
           </Button>
         </Link>
         <Link href="/">
@@ -48,14 +48,14 @@ export function MobileNav() {
             </div>
           </Button>
         </Link>
-        <Link href="/create">
+        <Link href="/moments">
           <Button 
-            variant={isActive("/create") ? "menuicon" : "ghost"} 
+            variant={isActive("/moments") ? "menuicon" : "ghost"} 
             size="menuicon" 
             className="flex flex-col items-center gap-1 h-auto py-2 px-3"
           >
-            <Plus className="h-5 w-5" />
-            <span className="text-xs">Create</span>
+            <Clock className="h-5 w-5" />
+            <span className="text-xs">Moments</span>
           </Button>
         </Link>
         <Link href="/me">
@@ -71,4 +71,4 @@ export function MobileNav() {
       </div>
     </div>
   )
-}
+              }
