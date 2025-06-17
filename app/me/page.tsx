@@ -1,16 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { Settings, Edit3, Calendar, MapPin, Link as LinkIcon, MoreHorizontal, Heart, MessageCircle, Repeat2, Share, Camera } from "lucide-react"
+import { Settings, Edit3, Calendar, MapPin, Link as LinkIcon, MoreHorizontal, Heart, MessageCircle, Repeat2, Share, Camera, Users, Star, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import Link from "next/link"
 
-// Mock user data
+// Mock user data with friends system
 const userData = {
   name: "Alex Chen",
   username: "@alexchen",
@@ -22,9 +23,8 @@ const userData = {
   coverImage: "/placeholder.svg?height=200&width=800&text=Cover",
   stats: {
     posts: 1247,
-    following: 892,
-    stans: 3421,
-    stannedIdols: 12
+    friends: 89, // Changed from following
+    stannedIdols: 12 // Keep stanned idols
   }
 }
 
@@ -71,16 +71,35 @@ const mockPosts = [
 
 // Mock stanned idols
 const stannedIdols = [
-  { id: "1", name: "Taylor Swift", avatar: "/placeholder.svg?height=48&width=48&text=TS", category: "Music" },
-  { id: "2", name: "BTS", avatar: "/placeholder.svg?height=48&width=48&text=BTS", category: "K-Pop" },
-  { id: "3", name: "Zendaya", avatar: "/placeholder.svg?height=48&width=48&text=Z", category: "Acting" },
-  { id: "4", name: "Ariana Grande", avatar: "/placeholder.svg?height=48&width=48&text=AG", category: "Music" },
-  { id: "5", name: "Blackpink", avatar: "/placeholder.svg?height=48&width=48&text=BP", category: "K-Pop" },
-  { id: "6", name: "Tom Holland", avatar: "/placeholder.svg?height=48&width=48&text=TH", category: "Acting" }
+  { id: "1", name: "Taylor Swift", avatar: "/placeholder.svg?height=48&width=48&text=TS", category: "Music", stans: 1200000 },
+  { id: "2", name: "BTS", avatar: "/placeholder.svg?height=48&width=48&text=BTS", category: "K-Pop", stans: 2500000 },
+  { id: "3", name: "Zendaya", avatar: "/placeholder.svg?height=48&width=48&text=Z", category: "Acting", stans: 980000 },
+  { id: "4", name: "Ariana Grande", avatar: "/placeholder.svg?height=48&width=48&text=AG", category: "Music", stans: 1500000 },
+  { id: "5", name: "Blackpink", avatar: "/placeholder.svg?height=48&width=48&text=BP", category: "K-Pop", stans: 1800000 },
+  { id: "6", name: "Tom Holland", avatar: "/placeholder.svg?height=48&width=48&text=TH", category: "Acting", stans: 850000 }
+]
+
+// Mock mutual friends data (for the popup)
+const mutualFriends = [
+  { id: "1", name: "Jake Wilson", username: "@jakew", avatar: "/placeholder.svg?height=48&width=48&text=JW", commonWith: "Sarah Johnson" },
+  { id: "2", name: "Amy Chen", username: "@amyc", avatar: "/placeholder.svg?height=48&width=48&text=AC", commonWith: "Mike Park" },
+  { id: "3", name: "Luis Garcia", username: "@luisg", avatar: "/placeholder.svg?height=48&width=48&text=LG", commonWith: "Emma Wilson" },
+  { id: "4", name: "Sophie Kim", username: "@sophiek", avatar: "/placeholder.svg?height=48&width=48&text=SK", commonWith: "David Kim" },
+  { id: "5", name: "Ryan Taylor", username: "@ryant", avatar: "/placeholder.svg?height=48&width=48&text=RT", commonWith: "Lisa Chen" }
+]
+const friends = [
+  { id: "1", name: "Sarah Johnson", username: "@sarahj_fan", avatar: "/placeholder.svg?height=48&width=48&text=SJ", mutualFriends: 12, topIdol: "Taylor Swift" },
+  { id: "2", name: "Mike Park", username: "@mikepark", avatar: "/placeholder.svg?height=48&width=48&text=MP", mutualFriends: 8, topIdol: "BTS" },
+  { id: "3", name: "Emma Wilson", username: "@emmaw", avatar: "/placeholder.svg?height=48&width=48&text=EW", mutualFriends: 15, topIdol: "Ariana Grande" },
+  { id: "4", name: "David Kim", username: "@davidk", avatar: "/placeholder.svg?height=48&width=48&text=DK", mutualFriends: 6, topIdol: "Taylor Swift" },
+  { id: "5", name: "Lisa Chen", username: "@lisac", avatar: "/placeholder.svg?height=48&width=48&text=LC", mutualFriends: 9, topIdol: "Blackpink" },
+  { id: "6", name: "Ryan Martinez", username: "@ryanm", avatar: "/placeholder.svg?height=48&width=48&text=RM", mutualFriends: 4, topIdol: "Zendaya" }
 ]
 
 export default function MePage() {
   const [activeTab, setActiveTab] = useState("posts")
+  const [friendsDialogOpen, setFriendsDialogOpen] = useState(false)
+  const [friendsTabValue, setFriendsTabValue] = useState("all")
 
   const PostCard = ({ post }: { post: any }) => (
     <Card className="border-0 border-b border-[#fec400]/10 rounded-none">
@@ -213,19 +232,70 @@ export default function MePage() {
             </div>
           </div>
 
+          {/* Updated stats section */}
           <div className="flex gap-6 text-sm">
             <div>
               <span className="font-bold text-foreground">{userData.stats.posts.toLocaleString()}</span>
               <span className="text-muted-foreground ml-1">Posts</span>
             </div>
-            <div>
-              <span className="font-bold text-foreground">{userData.stats.following.toLocaleString()}</span>
-              <span className="text-muted-foreground ml-1">Following</span>
-            </div>
-            <div>
-              <span className="font-bold text-foreground">{userData.stats.stans.toLocaleString()}</span>
-              <span className="text-muted-foreground ml-1">Followers</span>
-            </div>
+            <Dialog open={friendsDialogOpen} onOpenChange={setFriendsDialogOpen}>
+              <DialogTrigger asChild>
+                <div className="cursor-pointer hover:underline">
+                  <span className="font-bold text-foreground">{userData.stats.friends.toLocaleString()}</span>
+                  <span className="text-muted-foreground ml-1">Friends</span>
+                </div>
+              </DialogTrigger>
+              <DialogContent className="max-w-md max-h-[80vh] overflow-hidden">
+                <DialogHeader>
+                  <DialogTitle>Friends</DialogTitle>
+                </DialogHeader>
+                <Tabs value={friendsTabValue} onValueChange={setFriendsTabValue} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="all">All Friends</TabsTrigger>
+                    <TabsTrigger value="mutual">Mutual Friends</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="all" className="mt-0 max-h-96 overflow-y-auto">
+                    <div className="space-y-3 p-1">
+                      {friends.map((friend) => (
+                        <div key={friend.id} className="flex items-center space-x-3 p-2 rounded hover:bg-muted">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={friend.avatar} alt={friend.name} />
+                            <AvatarFallback>{friend.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-sm">{friend.name}</h3>
+                            <p className="text-xs text-muted-foreground">{friend.username}</p>
+                          </div>
+                          <Button variant="outline" size="sm">
+                            Message
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="mutual" className="mt-0 max-h-96 overflow-y-auto">
+                    <div className="space-y-3 p-1">
+                      {mutualFriends.map((friend) => (
+                        <div key={friend.id} className="flex items-center space-x-3 p-2 rounded hover:bg-muted">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={friend.avatar} alt={friend.name} />
+                            <AvatarFallback>{friend.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-sm">{friend.name}</h3>
+                            <p className="text-xs text-muted-foreground">{friend.username}</p>
+                            <p className="text-xs text-[#fec400]">Mutual with {friend.commonWith}</p>
+                          </div>
+                          <Button variant="outline" size="sm">
+                            Add Friend
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </DialogContent>
+            </Dialog>
             <div>
               <span className="font-bold text-[#fec400]">{userData.stats.stannedIdols}</span>
               <span className="text-muted-foreground ml-1">Stanned</span>
@@ -236,7 +306,7 @@ export default function MePage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-transparent border-b border-[#fec400]/20 rounded-none h-auto p-0">
+        <TabsList className="grid w-full grid-cols-4 bg-transparent border-b border-[#fec400]/20 rounded-none h-auto p-0">
           <TabsTrigger 
             value="posts" 
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#fec400] data-[state=active]:bg-transparent"
@@ -248,6 +318,12 @@ export default function MePage() {
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#fec400] data-[state=active]:bg-transparent"
           >
             Stanned
+          </TabsTrigger>
+          <TabsTrigger 
+            value="friends" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#fec400] data-[state=active]:bg-transparent"
+          >
+            Friends
           </TabsTrigger>
           <TabsTrigger 
             value="liked" 
@@ -276,9 +352,49 @@ export default function MePage() {
                       <AvatarFallback>{idol.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <h3 className="font-semibold text-sm mb-1">{idol.name}</h3>
-                    <Badge variant="secondary" className="text-xs bg-[#fec400]/10 text-[#fec400] border-[#fec400]/20">
+                    <Badge variant="secondary" className="text-xs bg-[#fec400]/10 text-[#fec400] border-[#fec400]/20 mb-2">
                       {idol.category}
                     </Badge>
+                    <p className="text-xs text-muted-foreground">
+                      {idol.stans.toLocaleString()} stans
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* New Friends tab */}
+        <TabsContent value="friends" className="mt-0">
+          <div className="p-4 space-y-4">
+            <div className="space-y-3">
+              {friends.map((friend) => (
+                <Card key={friend.id} className="border border-[#fec400]/20 hover:border-[#fec400]/40 transition-colors">
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={friend.avatar} alt={friend.name} />
+                        <AvatarFallback>{friend.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-sm">{friend.name}</h3>
+                        <p className="text-xs text-muted-foreground mb-1">{friend.username}</p>
+                        <div className="flex items-center space-x-3 text-xs text-muted-foreground">
+                          <div className="flex items-center space-x-1">
+                            <Users className="h-3 w-3" />
+                            <span>{friend.mutualFriends} mutual</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Star className="h-3 w-3 text-[#fec400]" />
+                            <span>Stans {friend.topIdol}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm" className="border-[#fec400]/40 text-[#fec400] hover:bg-[#fec400] hover:text-black">
+                        Message
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -295,4 +411,4 @@ export default function MePage() {
       </Tabs>
     </div>
   )
-  }
+}
