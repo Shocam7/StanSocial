@@ -19,7 +19,7 @@ interface IdolStatsProps {
 
 export function IdolStats({ idol, stats }: IdolStatsProps) {
   const engagementRate =
-    stats.totalPosts > 0 ? ((stats.totalLikes + stats.totalComments) / (stats.totalPosts * idol.followers)) * 100 : 0
+    stats.totalPosts > 0 ? ((stats.totalLikes + stats.totalComments) / (stats.totalPosts * idol.stans)) * 100 : 0
 
   return (
     <div className="space-y-6">
@@ -129,7 +129,7 @@ export function IdolStats({ idol, stats }: IdolStatsProps) {
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm">Total Stans</span>
-              <span className="font-bold">{idol.followers.toLocaleString()}</span>
+              <span className="font-bold">{idol.stans.toLocaleString()}</span>
             </div>
 
             <div className="flex justify-between items-center">
@@ -178,7 +178,7 @@ export function IdolStats({ idol, stats }: IdolStatsProps) {
               <div className="text-2xl font-bold text-primary mb-1">💫</div>
               <div className="font-semibold">Milestone</div>
               <div className="text-xs text-muted-foreground">
-                {idol.followers > 1000000 ? "1M+" : "500K+"} stans reached
+                {idol.stans > 1000000 ? "1M+" : "500K+"} stans reached
               </div>
             </div>
           </div>

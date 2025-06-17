@@ -3,7 +3,7 @@ export interface Idol {
   name: string
   image: string
   category: string
-  followers: number
+  stans: number
   isStanned?: boolean
 }
 

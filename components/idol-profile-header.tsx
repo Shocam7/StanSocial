@@ -15,11 +15,11 @@ interface IdolProfileHeaderProps {
 export function IdolProfileHeader({ idol }: IdolProfileHeaderProps) {
   const router = useRouter()
   const [isStanned, setIsStanned] = useState(idol.isStanned || false)
-  const [followers, setFollowers] = useState(idol.followers)
+  const [stans, setFollowers] = useState(idol.stans)
 
   const toggleStan = () => {
     setIsStanned(!isStanned)
-    setFollowers(isStanned ? followers - 1 : followers + 1)
+    setFollowers(isStanned ? stans - 1 : stans + 1)
   }
 
   return (
@@ -32,7 +32,7 @@ export function IdolProfileHeader({ idol }: IdolProfileHeaderProps) {
           </Button>
           <div>
             <h1 className="text-xl font-bold">{idol.name}</h1>
-            <p className="text-sm text-muted-foreground">{followers.toLocaleString()} stans</p>
+            <p className="text-sm text-muted-foreground">{stans.toLocaleString()} stans</p>
           </div>
         </div>
       </div>
@@ -104,7 +104,7 @@ export function IdolProfileHeader({ idol }: IdolProfileHeaderProps) {
 
           <div className="flex items-center space-x-6 text-sm">
             <div>
-              <span className="font-bold">{followers.toLocaleString()}</span>{" "}
+              <span className="font-bold">{stans.toLocaleString()}</span>{" "}
               <span className="text-muted-foreground">Stans</span>
             </div>
             <div>

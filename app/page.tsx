@@ -18,7 +18,7 @@ const sampleIdols: Idol[] = [
     name: "Taylor Swift",
     image: "/placeholder.svg?height=48&width=48&text=TS",
     category: "Music",
-    followers: 1200000,
+    stans: 1200000,
     isStanned: true,
   },
   {
@@ -26,7 +26,7 @@ const sampleIdols: Idol[] = [
     name: "BTS",
     image: "/placeholder.svg?height=48&width=48&text=BTS",
     category: "K-Pop",
-    followers: 2500000,
+    stans: 2500000,
     isStanned: true,
   },
   {
@@ -34,7 +34,7 @@ const sampleIdols: Idol[] = [
     name: "Zendaya",
     image: "/placeholder.svg?height=48&width=48&text=Z",
     category: "Acting",
-    followers: 980000,
+    stans: 980000,
     isStanned: false,
   },
   {
@@ -42,7 +42,7 @@ const sampleIdols: Idol[] = [
     name: "Blackpink",
     image: "/placeholder.svg?height=48&width=48&text=BP",
     category: "K-Pop",
-    followers: 1800000,
+    stans: 1800000,
     isStanned: false,
   },
   {
@@ -50,7 +50,7 @@ const sampleIdols: Idol[] = [
     name: "Tom Holland",
     image: "/placeholder.svg?height=48&width=48&text=TH",
     category: "Acting",
-    followers: 850000,
+    stans: 850000,
     isStanned: false,
   },
   {
@@ -58,7 +58,7 @@ const sampleIdols: Idol[] = [
     name: "Ariana Grande",
     image: "/placeholder.svg?height=48&width=48&text=AG",
     category: "Music",
-    followers: 1500000,
+    stans: 1500000,
     isStanned: true,
   },
 ]

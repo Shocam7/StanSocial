@@ -15,7 +15,7 @@ interface IdolCardProps {
 
 export function IdolCard({ idol }: IdolCardProps) {
   const [isStanned, setIsStanned] = useState(idol.isStanned || false)
-  const [followers, setFollowers] = useState(idol.followers)
+  const [stans, setFollowers] = useState(idol.stans)
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
@@ -24,7 +24,7 @@ export function IdolCard({ idol }: IdolCardProps) {
 
     // Update UI optimistically
     setIsStanned(!isStanned)
-    setFollowers(isStanned ? followers - 1 : followers + 1)
+    setFollowers(isStanned ? stans - 1 : stans + 1)
 
     // Send to server
     const result = await toggleStanIdol(idol.id, isStanned)
@@ -34,7 +34,7 @@ export function IdolCard({ idol }: IdolCardProps) {
     if (!result.success) {
       // Revert on failure
       setIsStanned(isStanned)
-      setFollowers(idol.followers)
+      setFollowers(idol.stans)
 
       toast({
         title: "Error",
@@ -63,7 +63,7 @@ export function IdolCard({ idol }: IdolCardProps) {
               </div>
             </div>
             <p className="text-sm mt-2">
-              <span className="font-semibold">{followers.toLocaleString()}</span>{" "}
+              <span className="font-semibold">{stans.toLocaleString()}</span>{" "}
               <span className="text-muted-foreground">stans</span>
             </p>
           </div>

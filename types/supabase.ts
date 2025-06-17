@@ -9,24 +9,24 @@ export interface Database {
           name: string
           image: string
           category: string
-          followers: number
           created_at: string
+          stans: number
         }
         Insert: {
           id?: string
           name: string
           image: string
           category: string
-          followers?: number
           created_at?: string
+          stans?: number
         }
         Update: {
           id?: string
           name?: string
           image?: string
           category?: string
-          followers?: number
           created_at?: string
+          stans?: number
         }
         Relationships: []
       }

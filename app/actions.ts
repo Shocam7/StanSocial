@@ -16,19 +16,19 @@ export async function toggleStanIdol(idolId: string, isStanning: boolean) {
       // Remove the stan relationship
       await supabase.from("user_stanned_idols").delete().eq("user_id", userId).eq("idol_id", idolId)
 
-      // Decrease follower count
+      // Decrease stan count
       await supabase
         .from("idols")
-        .update({ followers: supabase.rpc("decrement", { x: 1 }) })
+        .update({ stans: supabase.rpc("decrement", { x: 1 }) })
         .eq("id", idolId)
     } else {
       // Add the stan relationship
       await supabase.from("user_stanned_idols").insert({ user_id: userId, idol_id: idolId })
 
-      // Increase follower count
+      // Increase stan count
       await supabase
         .from("idols")
-        .update({ followers: supabase.rpc("increment", { x: 1 }) })
+        .update({ stans: supabase.rpc("increment", { x: 1 }) })
         .eq("id", idolId)
     }
 

@@ -38,7 +38,7 @@ export default async function DiscoverPage() {
       name: idol.name,
       image: idol.image,
       category: idol.category,
-      followers: idol.followers,
+      stans: idol.stans,
       isStanned: stannedIdolIds.includes(idol.id),
     })) || []
 
@@ -88,10 +88,10 @@ export default async function DiscoverPage() {
             name: idolData.name,
             image: idolData.image,
             category: idolData.category,
-            followers: idolData.followers,
+            stans: idolData.stans,
             isStanned: stannedIdolIds.includes(idolData.id),
           }
-        : { id: "", name: "Unknown Idol", image: "", category: "", followers: 0, isStanned: false }
+        : { id: "", name: "Unknown Idol", image: "", category: "", stans: 0, isStanned: false }
 
       return {
         id: post.id,

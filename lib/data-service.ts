@@ -43,9 +43,9 @@ const mapDatabasePostToAppPost = async (post: any): Promise<DiscoverPost> => {
         name: idolData.name,
         image: idolData.image,
         category: idolData.category,
-        followers: idolData.followers,
+        stans: idolData.stans,
       }
-    : { id: "", name: "Unknown Idol", image: "", category: "", followers: 0 }
+    : { id: "", name: "Unknown Idol", image: "", category: "", stans: 0 }
 
   // Calculate timestamp
   const timestamp = getRelativeTimeString(new Date(post.created_at))

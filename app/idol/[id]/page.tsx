@@ -17,7 +17,7 @@ const sampleIdols: Idol[] = [
     name: "Taylor Swift",
     image: "/placeholder.svg?height=120&width=120&text=TS",
     category: "Music",
-    followers: 1200000,
+    stans: 1200000,
     isStanned: true,
   },
   {
@@ -25,7 +25,7 @@ const sampleIdols: Idol[] = [
     name: "BTS",
     image: "/placeholder.svg?height=120&width=120&text=BTS",
     category: "K-Pop",
-    followers: 2500000,
+    stans: 2500000,
     isStanned: true,
   },
   {
@@ -33,7 +33,7 @@ const sampleIdols: Idol[] = [
     name: "Zendaya",
     image: "/placeholder.svg?height=120&width=120&text=Z",
     category: "Acting",
-    followers: 980000,
+    stans: 980000,
     isStanned: false,
   },
   {
@@ -41,7 +41,7 @@ const sampleIdols: Idol[] = [
     name: "Blackpink",
     image: "/placeholder.svg?height=120&width=120&text=BP",
     category: "K-Pop",
-    followers: 1800000,
+    stans: 1800000,
     isStanned: false,
   },
   {
@@ -49,7 +49,7 @@ const sampleIdols: Idol[] = [
     name: "Tom Holland",
     image: "/placeholder.svg?height=120&width=120&text=TH",
     category: "Acting",
-    followers: 850000,
+    stans: 850000,
     isStanned: false,
   },
   {
@@ -57,7 +57,7 @@ const sampleIdols: Idol[] = [
     name: "Ariana Grande",
     image: "/placeholder.svg?height=120&width=120&text=AG",
     category: "Music",
-    followers: 1500000,
+    stans: 1500000,
     isStanned: true,
   },
 ]
@@ -161,7 +161,7 @@ export default async function IdolPage({ params }: IdolPageProps) {
 
   // Sample recent activity data
   const recentActivity = [
-    { type: "milestone", content: `Reached ${idol.followers.toLocaleString()} stans!`, timestamp: "2d" },
+    { type: "milestone", content: `Reached ${idol.stans.toLocaleString()} stans!`, timestamp: "2d" },
     { type: "trending", content: "Trending in Music category", timestamp: "3d" },
     { type: "popular", content: "Most discussed idol this week", timestamp: "5d" },
   ]
@@ -258,7 +258,7 @@ export default async function IdolPage({ params }: IdolPageProps) {
                 <p className="text-xs text-muted-foreground">Posts</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-primary">{idol.followers.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-primary">{idol.stans.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground">Stans</p>
               </div>
               <div>

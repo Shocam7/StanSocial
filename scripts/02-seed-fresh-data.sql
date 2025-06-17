@@ -14,7 +14,7 @@ INSERT INTO users (id, name, username, avatar) VALUES
   ('00000000-0000-0000-0000-000000000010', 'Ryan Torres', 'ryan_music', '/placeholder.svg?height=32&width=32');
 
 -- Insert sample idols
-INSERT INTO idols (id, name, image, category, followers) VALUES
+INSERT INTO idols (id, name, image, category, stans) VALUES
   ('00000000-0000-0000-0000-000000000101', 'Taylor Swift', '/placeholder.svg?height=48&width=48&text=TS', 'Music', 1200000),
   ('00000000-0000-0000-0000-000000000102', 'BTS', '/placeholder.svg?height=48&width=48&text=BTS', 'K-Pop', 2500000),
   ('00000000-0000-0000-0000-000000000103', 'Zendaya', '/placeholder.svg?height=48&width=48&text=Z', 'Acting', 980000),

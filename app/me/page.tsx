@@ -23,7 +23,7 @@ const userData = {
   stats: {
     posts: 1247,
     following: 892,
-    followers: 3421,
+    stans: 3421,
     stannedIdols: 12
   }
 }
@@ -223,7 +223,7 @@ export default function MePage() {
               <span className="text-muted-foreground ml-1">Following</span>
             </div>
             <div>
-              <span className="font-bold text-foreground">{userData.stats.followers.toLocaleString()}</span>
+              <span className="font-bold text-foreground">{userData.stats.stans.toLocaleString()}</span>
               <span className="text-muted-foreground ml-1">Followers</span>
             </div>
             <div>
