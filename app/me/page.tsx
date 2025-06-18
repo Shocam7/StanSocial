@@ -248,7 +248,7 @@ export default function MePage() {
                   <span className="text-muted-foreground ml-1">Friends</span>
                 </div>
               </DialogTrigger>
-              <DialogContent className="max-w-md max-h-[80vh] overflow-hidden bg-background/10 backdrop-blur supports-[backdrop-filter]:bg-background/10 border border-border/30">
+              <DialogContent className="max-w-md max-h-[80vh] overflow-hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-[#fec400]/40">
                 <DialogHeader>
                   <DialogTitle>Friends</DialogTitle>
                 </DialogHeader>
