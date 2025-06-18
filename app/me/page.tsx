@@ -248,7 +248,7 @@ export default function MePage() {
                   <span className="text-muted-foreground ml-1">Friends</span>
                 </div>
               </DialogTrigger>
-              <DialogContent className="max-w-md max-h-[80vh] overflow-hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-[#fec400]/40">
+              <DialogContent className="max-w-md max-h-[80vh] overflow-hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border border-border/50">
                 <DialogHeader>
                   <DialogTitle>Friends</DialogTitle>
                 </DialogHeader>
@@ -300,7 +300,7 @@ export default function MePage() {
               </DialogContent>
             </Dialog>
 
-            {/* Stanned Idols Dialog with golden blur effect */}
+            {/* Stanned Idols Dialog with blur effect */}
             <Dialog open={stannedDialogOpen} onOpenChange={setStannedDialogOpen}>
               <DialogTrigger asChild>
                 <div className="cursor-pointer hover:underline">
@@ -308,30 +308,26 @@ export default function MePage() {
                   <span className="text-muted-foreground ml-1">Stanned</span>
                 </div>
               </DialogTrigger>
-              <DialogContent className="max-w-md max-h-[80vh] overflow-hidden bg-[#fec400]/10 backdrop-blur supports-[backdrop-filter]:bg-[#fec400]/5 border-[#fec400]/60">
+              <DialogContent className="max-w-md max-h-[80vh] overflow-hidden bg-[#fec400]/10 backdrop-blur supports-[backdrop-filter]:bg-[#fec400]/10 border border-[#fec400]/30">
                 <DialogHeader>
                   <DialogTitle className="text-[#fec400]">Stanned Idols</DialogTitle>
                 </DialogHeader>
                 <div className="max-h-96 overflow-y-auto">
                   <div className="grid grid-cols-2 gap-3 p-1">
                     {stannedIdols.map((idol) => (
-                      <Card key={idol.id} className="border border-[#fec400]/30 hover:border-[#fec400]/60 transition-colors bg-background/80 backdrop-blur">
-                        <CardContent className="p-3 text-center">
-                          <Avatar className="h-12 w-12 mx-auto mb-2">
-                            <AvatarImage src={idol.avatar} alt={idol.name} />
-                            <AvatarFallback>{idol.name.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <h3 className="font-semibold text-xs mb-1 truncate">{idol.name}</h3>
-                          <Badge variant="secondary" className="text-xs bg-[#fec400]/20 text-[#fec400] border-[#fec400]/30 mb-1">
-                            {idol.category}
-                          </Badge>
-                          <p className="text-xs text-muted-foreground">
-                            {idol.stans > 1000000 
-                              ? `${(idol.stans / 1000000).toFixed(1)}M` 
-                              : `${(idol.stans / 1000).toFixed(0)}K`} stans
-                          </p>
-                        </CardContent>
-                      </Card>
+                      <div key={idol.id} className="border border-[#fec400]/20 hover:border-[#fec400]/40 transition-colors rounded-lg p-3 text-center bg-background/20 backdrop-blur-sm">
+                        <Avatar className="h-12 w-12 mx-auto mb-2">
+                          <AvatarImage src={idol.avatar} alt={idol.name} />
+                          <AvatarFallback>{idol.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <h3 className="font-semibold text-sm mb-1">{idol.name}</h3>
+                        <Badge variant="secondary" className="text-xs bg-[#fec400]/20 text-[#fec400] border-[#fec400]/30 mb-1">
+                          {idol.category}
+                        </Badge>
+                        <p className="text-xs text-muted-foreground">
+                          {idol.stans.toLocaleString()} stans
+                        </p>
+                      </div>
                     ))}
                   </div>
                 </div>
