@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Post } from "@/components/post"
 import Link from "next/link"
 
 // Mock user data with friends system
@@ -32,39 +33,63 @@ const userData = {
 const mockPosts = [
   {
     id: "1",
+    user: {
+      id: "1",
+      name: userData.name,
+      username: userData.username.replace("@", ""),
+      avatar: userData.avatar
+    },
     content: "Just watched Taylor's new music video and I'm OBSESSED! The cinematography is incredible 🎬✨ #TaylorSwift",
     timestamp: "2h",
     likes: 245,
     comments: 18,
     reposts: 32,
+    liked: false,
     idol: {
+      id: "1",
       name: "Taylor Swift",
-      avatar: "/placeholder.svg?height=24&width=24&text=TS"
+      image: "/placeholder.svg?height=48&width=48&text=TS"
     },
     image: "/placeholder.svg?height=300&width=500&text=Post+Image"
   },
   {
     id: "2",
+    user: {
+      id: "1",
+      name: userData.name,
+      username: userData.username.replace("@", ""),
+      avatar: userData.avatar
+    },
     content: "BTS really changed my life. Their message of self-love and acceptance means everything to me 💜 #BTS #ARMY",
     timestamp: "1d",
     likes: 189,
     comments: 24,
     reposts: 15,
+    liked: true,
     idol: {
+      id: "2",
       name: "BTS",
-      avatar: "/placeholder.svg?height=24&width=24&text=BTS"
+      image: "/placeholder.svg?height=48&width=48&text=BTS"
     }
   },
   {
     id: "3",
+    user: {
+      id: "1",
+      name: userData.name,
+      username: userData.username.replace("@", ""),
+      avatar: userData.avatar
+    },
     content: "Zendaya's fashion choices are always impeccable. She's truly an icon 👑",
     timestamp: "3d",
     likes: 156,
     comments: 12,
     reposts: 8,
+    liked: false,
     idol: {
+      id: "3",
       name: "Zendaya",
-      avatar: "/placeholder.svg?height=24&width=24&text=Z"
+      image: "/placeholder.svg?height=48&width=48&text=Z"
     }
   }
 ]
@@ -101,62 +126,6 @@ export default function MePage() {
   const [friendsDialogOpen, setFriendsDialogOpen] = useState(false)
   const [stannedDialogOpen, setStannedDialogOpen] = useState(false)
   const [friendsTabValue, setFriendsTabValue] = useState("all")
-
-  const PostCard = ({ post }: { post: any }) => (
-    <Card className="border-0 border-b border-[#fec400]/10 rounded-none">
-      <CardContent className="p-4">
-        <div className="flex space-x-3">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={userData.avatar} alt={userData.name} />
-            <AvatarFallback>AC</AvatarFallback>
-          </Avatar>
-          
-          <div className="flex-1 space-y-3">
-            <div className="flex items-center space-x-2">
-              <span className="font-semibold">{userData.name}</span>
-              <span className="text-muted-foreground">{userData.username}</span>
-              <span className="text-muted-foreground">·</span>
-              <span className="text-muted-foreground text-sm">{post.timestamp}</span>
-            </div>
-
-            <div className="flex items-center space-x-2 mb-2">
-              <Avatar className="h-5 w-5">
-                <AvatarImage src={post.idol.avatar} alt={post.idol.name} />
-                <AvatarFallback>{post.idol.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <span className="text-sm text-[#fec400] font-medium">About {post.idol.name}</span>
-            </div>
-
-            <p className="text-sm leading-relaxed">{post.content}</p>
-
-            {post.image && (
-              <div className="rounded-lg overflow-hidden border border-[#fec400]/20">
-                <img src={post.image} alt="Post image" className="w-full h-48 object-cover" />
-              </div>
-            )}
-
-            <div className="flex items-center justify-between pt-2 max-w-md">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-[#fec400] hover:bg-[#fec400]/10">
-                <MessageCircle className="h-4 w-4 mr-2" />
-                {post.comments}
-              </Button>
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-[#fec400] hover:bg-[#fec400]/10">
-                <Repeat2 className="h-4 w-4 mr-2" />
-                {post.reposts}
-              </Button>
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-500 hover:bg-red-500/10">
-                <Heart className="h-4 w-4 mr-2" />
-                {post.likes}
-              </Button>
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-[#fec400] hover:bg-[#fec400]/10">
-                <Share className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -248,7 +217,7 @@ export default function MePage() {
                   <span className="text-muted-foreground ml-1">Friends</span>
                 </div>
               </DialogTrigger>
-              <DialogContent className="max-w-md max-h-[80vh] overflow-hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-[#fec400]/40">
+              <DialogContent className="max-w-md max-h-[80vh] overflow-hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border border-border/50">
                 <DialogHeader>
                   <DialogTitle>Friends</DialogTitle>
                 </DialogHeader>
@@ -369,7 +338,18 @@ export default function MePage() {
         <TabsContent value="posts" className="mt-0">
           <div className="space-y-0">
             {mockPosts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <Post
+                key={post.id}
+                user={post.user}
+                content={post.content}
+                image={post.image}
+                timestamp={post.timestamp}
+                likes={post.likes}
+                comments={post.comments}
+                reposts={post.reposts}
+                liked={post.liked}
+                idol={post.idol}
+              />
             ))}
           </div>
         </TabsContent>
