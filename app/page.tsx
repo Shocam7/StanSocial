@@ -37,48 +37,44 @@ function getRelativeTimeString(date: Date): string {
   return `${Math.floor(diffInSeconds / 86400)}d`
 }
 
-// Convert database post to app post
-const mapDatabasePostToPost = async (post: any): Promise<PostType> => {
-  const supabase = getSupabaseBrowser()
+// Optimized function to batch convert database posts
+const mapDatabasePostsToPosts = async (posts: any[], usersMap: Map<string, any>, idolsMap: Map<string, any>): Promise<PostType[]> => {
+  return posts.map(post => {
+    const userData = usersMap.get(post.user_id)
+    const idolData = idolsMap.get(post.idol_id)
 
-  // Fetch the user
-  const { data: userData } = await supabase.from("users").select("*").eq("id", post.user_id).single()
+    const user = userData
+      ? {
+          name: userData.name,
+          username: userData.username,
+          avatar: userData.avatar,
+        }
+      : { name: "Unknown User", username: "unknown", avatar: "" }
 
-  // Fetch the idol
-  const { data: idolData } = await supabase.from("idols").select("*").eq("id", post.idol_id).single()
+    const idol = idolData
+      ? {
+          id: idolData.id,
+          name: idolData.name,
+          image: idolData.image,
+          category: idolData.category,
+          stans: idolData.stans,
+        }
+      : { id: "", name: "Unknown Idol", image: "", category: "", stans: 0 }
 
-  const user = userData
-    ? {
-        name: userData.name,
-        username: userData.username,
-        avatar: userData.avatar,
-      }
-    : { name: "Unknown User", username: "unknown", avatar: "" }
+    const timestamp = getRelativeTimeString(new Date(post.created_at))
 
-  const idol = idolData
-    ? {
-        id: idolData.id,
-        name: idolData.name,
-        image: idolData.image,
-        category: idolData.category,
-        stans: idolData.stans,
-      }
-    : { id: "", name: "Unknown Idol", image: "", category: "", stans: 0 }
-
-  // Calculate timestamp
-  const timestamp = getRelativeTimeString(new Date(post.created_at))
-
-  return {
-    id: post.id,
-    content: post.content || post.title || post.poll_question || "",
-    image: post.image || undefined,
-    timestamp,
-    likes: post.likes,
-    comments: post.comments,
-    reposts: post.reposts,
-    user,
-    idol,
-  }
+    return {
+      id: post.id,
+      content: post.content || post.title || post.poll_question || "",
+      image: post.image || undefined,
+      timestamp,
+      likes: post.likes,
+      comments: post.comments,
+      reposts: post.reposts,
+      user,
+      idol,
+    }
+  })
 }
 
 export default function Home() {
@@ -151,44 +147,73 @@ export default function Home() {
         setStannedIdols(stannedIdolsList)
         setDiscoverIdols(discoverIdolsList)
 
-        // Fetch posts from stanned idols using the array of IDs
-        if (stannedIdolIds.length > 0) {
-          const { data: posts, error: postsError } = await supabase
-            .from("posts")
-            .select("*")
-            .in("idol_id", stannedIdolIds)
-            .order("created_at", { ascending: false })
-            .limit(20)
-
-          if (postsError) {
-            console.error("Error fetching posts:", postsError)
-            setError("Failed to fetch posts")
-            return
-          }
-
-          // Convert posts to the expected format
-          const convertedPosts = await Promise.all(
-            (posts || []).map(post => mapDatabasePostToPost(post))
-          )
+        // Fetch posts from stanned idols and trending posts in parallel
+        const [feedPostsResponse, trendingPostsResponse] = await Promise.all([
+          // Feed posts - only if user has stanned idols
+          stannedIdolIds.length > 0 
+            ? supabase
+                .from("posts")
+                .select(`
+                  *,
+                  users!posts_user_id_fkey(id, name, username, avatar),
+                  idols!posts_idol_id_fkey(id, name, image, category, stans)
+                `)
+                .in("idol_id", stannedIdolIds)
+                .order("created_at", { ascending: false })
+                .limit(20)
+            : Promise.resolve({ data: [], error: null }),
           
-          setFeedPosts(convertedPosts)
+          // Trending posts
+          supabase
+            .from("posts")
+            .select(`
+              *,
+              users!posts_user_id_fkey(id, name, username, avatar),
+              idols!posts_idol_id_fkey(id, name, image, category, stans)
+            `)
+            .order("trending_score", { ascending: false })
+            .limit(10)
+        ])
+
+        // Handle feed posts
+        if (feedPostsResponse.error) {
+          console.error("Error fetching feed posts:", feedPostsResponse.error)
+          setError("Failed to fetch feed posts")
+          return
         }
 
-        // Fetch trending posts (highest trending score)
-        const { data: trendingPostsData, error: trendingError } = await supabase
-          .from("posts")
-          .select("*")
-          .order("trending_score", { ascending: false })
-          .limit(10)
-
-        if (trendingError) {
-          console.error("Error fetching trending posts:", trendingError)
-        } else {
-          const convertedTrendingPosts = await Promise.all(
-            (trendingPostsData || []).map(post => mapDatabasePostToPost(post))
-          )
-          setTrendingPosts(convertedTrendingPosts)
+        // Handle trending posts
+        if (trendingPostsResponse.error) {
+          console.error("Error fetching trending posts:", trendingPostsResponse.error)
         }
+
+        // Convert posts with embedded user and idol data
+        const convertFeedPosts = (posts: any[]) => {
+          return posts.map(post => ({
+            id: post.id,
+            content: post.content || post.title || post.poll_question || "",
+            image: post.image || undefined,
+            timestamp: getRelativeTimeString(new Date(post.created_at)),
+            likes: post.likes,
+            comments: post.comments,
+            reposts: post.reposts,
+            user: {
+              name: post.users?.name || "Unknown User",
+              username: post.users?.username || "unknown",
+              avatar: post.users?.avatar || "",
+            },
+            idol: {
+              id: post.idols?.id || "",
+              name: post.idols?.name || "Unknown Idol",
+              image: post.idols?.image || "",
+              category: post.idols?.category || "",
+              stans: post.idols?.stans || 0,
+            },
+          }))
+        }
+
+        setFeedPosts(convertFeedPosts(feedPostsResponse.data || []))
+        setTrendingPosts(convertFeedPosts(trendingPostsResponse.data || []))
 
       } catch (err) {
         console.error("Error in fetchData:", err)

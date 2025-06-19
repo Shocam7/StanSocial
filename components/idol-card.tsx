@@ -11,6 +11,7 @@ import Link from "next/link"
 
 interface IdolCardProps {
   idol: Idol
+  onStanToggle?: (idolId: string, isCurrentlyStanned: boolean) => void
 }
 
 export function IdolCard({ idol }: IdolCardProps) {
@@ -74,10 +75,8 @@ export function IdolCard({ idol }: IdolCardProps) {
           <Button
             variant={isStanned ? "default" : "outline"}
             size="sm"
-            onClick={(e) => {
-              e.preventDefault()
-              toggleStan()
-            }}
+            onClick={() => onStanToggle?.(idol.id, idol.isStanned)}
+
             disabled={isLoading}
             className={
               isStanned
