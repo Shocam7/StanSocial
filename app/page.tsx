@@ -90,7 +90,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
 
   // For now, we'll use a mock user ID. In a real app, this would come from authentication
-  const currentUserId = "user-1" // Replace with actual user ID from auth
+  const currentUserId = "00000000-0000-0000-0000-000000000001" // Replace with actual user ID from auth
 
   useEffect(() => {
     const fetchData = async () => {
