@@ -3,156 +3,226 @@
 import { AvatarFallback } from "@/components/ui/avatar"
 import { AvatarImage } from "@/components/ui/avatar"
 import { Avatar } from "@/components/ui/avatar"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Header } from "@/components/header"
 import { Post } from "@/components/post"
 import { IdolCard } from "@/components/idol-card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FloatingNavButton } from "@/components/floating-nav-button"
-import type { Idol, Post as PostType } from "@/types"
+import { getSupabaseBrowser } from "@/lib/supabase"
+import type { Idol, Post as PostType, DiscoverPost } from "@/types"
 
-// Sample data
-const sampleIdols: Idol[] = [
-  {
-    id: "1",
-    name: "Taylor Swift",
-    image: "/placeholder.svg?height=48&width=48&text=TS",
-    category: "Music",
-    stans: 1200000,
-    isStanned: true,
-  },
-  {
-    id: "2",
-    name: "BTS",
-    image: "/placeholder.svg?height=48&width=48&text=BTS",
-    category: "K-Pop",
-    stans: 2500000,
-    isStanned: true,
-  },
-  {
-    id: "3",
-    name: "Zendaya",
-    image: "/placeholder.svg?height=48&width=48&text=Z",
-    category: "Acting",
-    stans: 980000,
-    isStanned: false,
-  },
-  {
-    id: "4",
-    name: "Blackpink",
-    image: "/placeholder.svg?height=48&width=48&text=BP",
-    category: "K-Pop",
-    stans: 1800000,
-    isStanned: false,
-  },
-  {
-    id: "5",
-    name: "Tom Holland",
-    image: "/placeholder.svg?height=48&width=48&text=TH",
-    category: "Acting",
-    stans: 850000,
-    isStanned: false,
-  },
-  {
-    id: "6",
-    name: "Ariana Grande",
-    image: "/placeholder.svg?height=48&width=48&text=AG",
-    category: "Music",
-    stans: 1500000,
-    isStanned: true,
-  },
-]
+// Convert DiscoverPost to PostType for compatibility
+const convertDiscoverPostToPost = (discoverPost: DiscoverPost): PostType => ({
+  id: discoverPost.id,
+  content: discoverPost.content || discoverPost.title || discoverPost.pollQuestion || "",
+  image: discoverPost.image,
+  timestamp: discoverPost.timestamp,
+  likes: discoverPost.likes,
+  comments: discoverPost.comments,
+  reposts: discoverPost.reposts,
+  liked: discoverPost.liked,
+  user: discoverPost.user,
+  idol: discoverPost.idol,
+})
 
-const samplePosts: PostType[] = [
-  {
-    id: "1",
-    content:
-      "Just saw Taylor's new music video and I'm obsessed! The visuals are incredible and the song is stuck in my head. #Swiftie",
-    timestamp: "2h",
-    likes: 245,
-    comments: 32,
-    reposts: 18,
-    liked: true,
-    user: {
-      name: "Sarah Johnson",
-      username: "sarahj_fan",
-      avatar: "/placeholder.svg?height=24&width=24",
-    },
-    idol: sampleIdols[0], // Taylor Swift
-  },
-  {
-    id: "2",
-    content:
-      "BeeTeeES just announced their world tour! Who's trying to get tickets? I'm already saving up for the VIP experience! 💜",
-    image: "/placeholder.svg?height=300&width=500&text=BTS+World+Tour",
-    timestamp: "4h",
-    likes: 1024,
-    comments: 156,
-    reposts: 87,
-    user: {
-      name: "Alex Chen",
-      username: "alexbtstan",
-      avatar: "/placeholder.svg?height=24&width=24",
-    },
-    idol: sampleIdols[1], // BTS
-  },
-  {
-    id: "3",
-    content:
-      "Ariana's vocals in her latest album are absolutely insane. The range, the control, the emotion... she's truly one of the best vocalists of our generation.",
-    timestamp: "6h",
-    likes: 578,
-    comments: 43,
-    reposts: 29,
-    user: {
-      name: "Maria Rodriguez",
-      username: "maria_arianator",
-      avatar: "/placeholder.svg?height=24&width=24",
-    },
-    idol: sampleIdols[5], // Ariana Grande
-  },
-  {
-    id: "4",
-    content:
-      "Taylor's surprise acoustic set at the end of the concert last night was magical. She played 'All Too Well' (10 minute version) and I was in tears. Best night ever! ❤️",
-    image: "/placeholder.svg?height=300&width=500&text=Concert+Moment",
-    timestamp: "12h",
-    likes: 892,
-    comments: 76,
-    reposts: 41,
-    user: {
-      name: "David Kim",
-      username: "david_swiftie",
-      avatar: "/placeholder.svg?height=24&width=24",
-    },
-    idol: sampleIdols[0], // Taylor Swift
-  },
-  {
-    id: "5",
-    content:
-      "The choreography in BTS's new music video is mind-blowing. They never disappoint with their performances. I've been trying to learn it all day!",
-    timestamp: "1d",
-    likes: 1456,
-    comments: 203,
-    reposts: 178,
-    user: {
-      name: "Emma Wilson",
-      username: "emma_btsarmy",
-      avatar: "/placeholder.svg?height=24&width=24",
-    },
-    idol: sampleIdols[1], // BTS
-  },
-]
+// Helper function to get relative time
+function getRelativeTimeString(date: Date): string {
+  const now = new Date()
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+
+  if (diffInSeconds < 60) return `${diffInSeconds}s`
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`
+  return `${Math.floor(diffInSeconds / 86400)}d`
+}
+
+// Convert database post to app post
+const mapDatabasePostToPost = async (post: any): Promise<PostType> => {
+  const supabase = getSupabaseBrowser()
+
+  // Fetch the user
+  const { data: userData } = await supabase.from("users").select("*").eq("id", post.user_id).single()
+
+  // Fetch the idol
+  const { data: idolData } = await supabase.from("idols").select("*").eq("id", post.idol_id).single()
+
+  const user = userData
+    ? {
+        name: userData.name,
+        username: userData.username,
+        avatar: userData.avatar,
+      }
+    : { name: "Unknown User", username: "unknown", avatar: "" }
+
+  const idol = idolData
+    ? {
+        id: idolData.id,
+        name: idolData.name,
+        image: idolData.image,
+        category: idolData.category,
+        stans: idolData.stans,
+      }
+    : { id: "", name: "Unknown Idol", image: "", category: "", stans: 0 }
+
+  // Calculate timestamp
+  const timestamp = getRelativeTimeString(new Date(post.created_at))
+
+  return {
+    id: post.id,
+    content: post.content || post.title || post.poll_question || "",
+    image: post.image || undefined,
+    timestamp,
+    likes: post.likes,
+    comments: post.comments,
+    reposts: post.reposts,
+    user,
+    idol,
+  }
+}
 
 export default function Home() {
-  const [stannedIdols, setStannedIdols] = useState<Idol[]>(sampleIdols.filter((idol) => idol.isStanned))
+  const [stannedIdols, setStannedIdols] = useState<Idol[]>([])
+  const [feedPosts, setFeedPosts] = useState<PostType[]>([])
+  const [discoverIdols, setDiscoverIdols] = useState<Idol[]>([])
+  const [trendingPosts, setTrendingPosts] = useState<PostType[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Filter posts to only show those about stanned idols
-  const stannedIdolIds = stannedIdols.map((idol) => idol.id)
-  const feedPosts = samplePosts.filter((post) => stannedIdolIds.includes(post.idol.id))
+  // For now, we'll use a mock user ID. In a real app, this would come from authentication
+  const currentUserId = "user-1" // Replace with actual user ID from auth
 
-  // Idols to discover (not currently stanned)
-  const discoverIdols = sampleIdols.filter((idol) => !idol.isStanned)
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const supabase = getSupabaseBrowser()
+
+        // Fetch user's stanned idols
+        const { data: stannedIdolIds, error: stannedError } = await supabase
+          .from("user_stanned_idols")
+          .select("idol_id")
+          .eq("user_id", currentUserId)
+
+        if (stannedError) {
+          console.error("Error fetching stanned idols:", stannedError)
+        }
+
+        // Fetch all idols
+        const { data: allIdols, error: idolsError } = await supabase
+          .from("idols")
+          .select("*")
+          .order("stans", { ascending: false })
+
+        if (idolsError) {
+          console.error("Error fetching idols:", idolsError)
+          setError("Failed to fetch idols")
+          return
+        }
+
+        const stannedIdolIdSet = new Set(stannedIdolIds?.map(item => item.idol_id) || [])
+        
+        // Separate stanned and discover idols
+        const stannedIdolsList: Idol[] = []
+        const discoverIdolsList: Idol[] = []
+
+        allIdols?.forEach(idol => {
+          const idolData: Idol = {
+            id: idol.id,
+            name: idol.name,
+            image: idol.image,
+            category: idol.category,
+            stans: idol.stans,
+            isStanned: stannedIdolIdSet.has(idol.id)
+          }
+
+          if (stannedIdolIdSet.has(idol.id)) {
+            stannedIdolsList.push(idolData)
+          } else {
+            discoverIdolsList.push(idolData)
+          }
+        })
+
+        setStannedIdols(stannedIdolsList)
+        setDiscoverIdols(discoverIdolsList)
+
+        // Fetch posts from stanned idols
+        if (stannedIdolsList.length > 0) {
+          const stannedIdolIds = stannedIdolsList.map(idol => idol.id)
+          
+          const { data: posts, error: postsError } = await supabase
+            .from("posts")
+            .select("*")
+            .in("idol_id", stannedIdolIds)
+            .order("created_at", { ascending: false })
+            .limit(20)
+
+          if (postsError) {
+            console.error("Error fetching posts:", postsError)
+            setError("Failed to fetch posts")
+            return
+          }
+
+          // Convert posts to the expected format
+          const convertedPosts = await Promise.all(
+            (posts || []).map(post => mapDatabasePostToPost(post))
+          )
+          
+          setFeedPosts(convertedPosts)
+        }
+
+        // Fetch trending posts (highest trending score)
+        const { data: trendingPostsData, error: trendingError } = await supabase
+          .from("posts")
+          .select("*")
+          .order("trending_score", { ascending: false })
+          .limit(10)
+
+        if (trendingError) {
+          console.error("Error fetching trending posts:", trendingError)
+        } else {
+          const convertedTrendingPosts = await Promise.all(
+            (trendingPostsData || []).map(post => mapDatabasePostToPost(post))
+          )
+          setTrendingPosts(convertedTrendingPosts)
+        }
+
+      } catch (err) {
+        console.error("Error in fetchData:", err)
+        setError("An unexpected error occurred")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [currentUserId])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#fec400] mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your feed...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-[#fec400] text-black rounded-lg hover:bg-[#fec400]/80"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
@@ -206,7 +276,7 @@ export default function Home() {
                   <div>
                     <h3 className="text-lg font-semibold mb-3">Trending Content</h3>
                     <div className="divide-y divide-[#fec400]/10">
-                      {samplePosts.slice(0, 3).map((post) => (
+                      {trendingPosts.slice(0, 3).map((post) => (
                         <Post key={post.id} {...post} />
                       ))}
                     </div>
@@ -231,7 +301,7 @@ export default function Home() {
           <div className="bg-muted rounded-lg p-4 border border-[#fec400]/20">
             <h3 className="font-bold text-lg mb-3">Popular Posts</h3>
             <div className="space-y-3">
-              {samplePosts.slice(0, 3).map((post, index) => (
+              {trendingPosts.slice(0, 3).map((post, index) => (
                 <div key={index} className="border-b border-[#fec400]/10 pb-3 last:border-0 last:pb-0">
                   <div className="flex items-center space-x-2 mb-1">
                     <Avatar className="h-6 w-6">
@@ -254,18 +324,13 @@ export default function Home() {
           <div className="bg-muted rounded-lg p-4 border border-[#fec400]/20">
             <h3 className="font-bold text-lg mb-3">Trending Topics</h3>
             <div className="space-y-2">
-              {[
-                { tag: "#TaylorSwiftEra", posts: "12.5K posts" },
-                { tag: "#BTSComeback", posts: "45.2K posts" },
-                { tag: "#ArianaNewAlbum", posts: "8.7K posts" },
-                { tag: "#KpopAwards", posts: "23.1K posts" },
-              ].map((trend, index) => (
+              {stannedIdols.slice(0, 4).map((idol, index) => (
                 <div
                   key={index}
                   className="cursor-pointer hover:bg-background rounded p-2 -m-2 border border-transparent hover:border-[#fec400]/20"
                 >
-                  <p className="font-medium">{trend.tag}</p>
-                  <p className="text-muted-foreground text-xs">{trend.posts}</p>
+                  <p className="font-medium">#{idol.name.replace(/\s+/g, '')}</p>
+                  <p className="text-muted-foreground text-xs">{idol.stans.toLocaleString()} stans</p>
                 </div>
               ))}
             </div>
