@@ -9,6 +9,8 @@ import { Post } from "@/components/post"
 import { IdolCard } from "@/components/idol-card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FloatingNavButton } from "@/components/floating-nav-button"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { getSupabaseBrowser } from "@/lib/supabase"
 import type { Idol, Post as PostType, DiscoverPost } from "@/types"
 
@@ -81,12 +83,22 @@ export default function Home() {
   const [stannedIdols, setStannedIdols] = useState<Idol[]>([])
   const [feedPosts, setFeedPosts] = useState<PostType[]>([])
   const [discoverIdols, setDiscoverIdols] = useState<Idol[]>([])
-  const [trendingPosts, setTrendingPosts] = useState<PostType[]>([])
+  const [explorePosts, setExplorePosts] = useState<PostType[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [carouselIndex, setCarouselIndex] = useState(0)
 
   // For now, we'll use a mock user ID. In a real app, this would come from authentication
   const currentUserId = "00000000-0000-0000-0000-000000000001" // Replace with actual user ID from auth
+
+  // Carousel navigation
+  const nextSlide = () => {
+    setCarouselIndex((prev) => (prev + 1) % Math.ceil(discoverIdols.length / 2))
+  }
+
+  const prevSlide = () => {
+    setCarouselIndex((prev) => (prev - 1 + Math.ceil(discoverIdols.length / 2)) % Math.ceil(discoverIdols.length / 2))
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -147,8 +159,11 @@ export default function Home() {
         setStannedIdols(stannedIdolsList)
         setDiscoverIdols(discoverIdolsList)
 
-        // Fetch posts from stanned idols and trending posts in parallel
-        const [feedPostsResponse, trendingPostsResponse] = await Promise.all([
+        // Get unstanned idol IDs for explore posts
+        const unstannedIdolIds = discoverIdolsList.map(idol => idol.id)
+
+        // Fetch posts from stanned idols and explore posts in parallel
+        const [feedPostsResponse, explorePostsResponse] = await Promise.all([
           // Feed posts - only if user has stanned idols
           stannedIdolIds.length > 0 
             ? supabase
@@ -163,16 +178,19 @@ export default function Home() {
                 .limit(20)
             : Promise.resolve({ data: [], error: null }),
           
-          // Trending posts
-          supabase
-            .from("posts")
-            .select(`
-              *,
-              users!posts_user_id_fkey(id, name, username, avatar),
-              idols!posts_idol_id_fkey(id, name, image, category, stans)
-            `)
-            .order("trending_score", { ascending: false })
-            .limit(10)
+          // Explore posts - recent posts from unstanned idols
+          unstannedIdolIds.length > 0
+            ? supabase
+                .from("posts")
+                .select(`
+                  *,
+                  users!posts_user_id_fkey(id, name, username, avatar),
+                  idols!posts_idol_id_fkey(id, name, image, category, stans)
+                `)
+                .in("idol_id", unstannedIdolIds)
+                .order("created_at", { ascending: false })
+                .limit(10)
+            : Promise.resolve({ data: [], error: null })
         ])
 
         // Handle feed posts
@@ -182,9 +200,9 @@ export default function Home() {
           return
         }
 
-        // Handle trending posts
-        if (trendingPostsResponse.error) {
-          console.error("Error fetching trending posts:", trendingPostsResponse.error)
+        // Handle explore posts
+        if (explorePostsResponse.error) {
+          console.error("Error fetching explore posts:", explorePostsResponse.error)
         }
 
         // Convert posts with embedded user and idol data
@@ -213,7 +231,7 @@ export default function Home() {
         }
 
         setFeedPosts(convertFeedPosts(feedPostsResponse.data || []))
-        setTrendingPosts(convertFeedPosts(trendingPostsResponse.data || []))
+        setExplorePosts(convertFeedPosts(explorePostsResponse.data || []))
 
       } catch (err) {
         console.error("Error in fetchData:", err)
@@ -345,41 +363,91 @@ export default function Home() {
               <div className="p-4">
                 <h2 className="text-xl font-bold mb-4">Personalized For You</h2>
                 <div className="space-y-6">
+                  {/* Recommended Idols Carousel */}
                   <div>
                     <h3 className="text-lg font-semibold mb-3">Recommended Idols</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {discoverIdols.slice(0, 2).map((idol) => (
-                        <IdolCard 
-                          key={idol.id} 
-                          idol={idol} 
-                          onStanToggle={handleStanToggle}
-                        />
-                      ))}
-                    </div>
+                    {discoverIdols.length > 0 ? (
+                      <div className="relative">
+                        <div className="overflow-hidden">
+                          <div 
+                            className="flex transition-transform duration-300 ease-in-out"
+                            style={{ transform: `translateX(-${carouselIndex * 100}%)` }}
+                          >
+                            {Array.from({ length: Math.ceil(discoverIdols.length / 2) }, (_, slideIndex) => (
+                              <div key={slideIndex} className="w-full flex-shrink-0">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-1">
+                                  {discoverIdols.slice(slideIndex * 2, (slideIndex * 2) + 2).map((idol) => (
+                                    <div key={idol.id} className="transform scale-90 origin-center">
+                                      <IdolCard 
+                                        idol={idol} 
+                                        onStanToggle={handleStanToggle}
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {/* Navigation buttons */}
+                        {discoverIdols.length > 2 && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 backdrop-blur border-[#fec400]/40"
+                              onClick={prevSlide}
+                            >
+                              <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 backdrop-blur border-[#fec400]/40"
+                              onClick={nextSlide}
+                            >
+                              <ChevronRight className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
+                        
+                        {/* Dots indicator */}
+                        {discoverIdols.length > 2 && (
+                          <div className="flex justify-center mt-4 space-x-2">
+                            {Array.from({ length: Math.ceil(discoverIdols.length / 2) }, (_, index) => (
+                              <button
+                                key={index}
+                                className={`w-2 h-2 rounded-full transition-colors ${
+                                  index === carouselIndex ? 'bg-[#fec400]' : 'bg-muted-foreground/30'
+                                }`}
+                                onClick={() => setCarouselIndex(index)}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-center py-8">No new idols to discover right now</p>
+                    )}
                   </div>
 
+                  {/* Explore Content */}
                   <div>
-                    <h3 className="text-lg font-semibold mb-3">Trending Content</h3>
+                    <h3 className="text-lg font-semibold mb-3">Explore Content</h3>
                     <div className="divide-y divide-[#fec400]/10">
-                      {trendingPosts.slice(0, 3).map((post) => (
-                        <Post key={post.id} {...post} />
-                      ))}
+                      {explorePosts.length > 0 ? (
+                        explorePosts.slice(0, 5).map((post) => (
+                          <Post key={post.id} {...post} />
+                        ))
+                      ) : (
+                        <div className="p-8 text-center">
+                          <p className="text-muted-foreground">No explore content available</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="discover" className="mt-0 p-4 pt-16">
-              <h2 className="text-xl font-bold mb-4">Discover New Idols to Stan</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {discoverIdols.map((idol) => (
-                  <IdolCard 
-                    key={idol.id} 
-                    idol={idol} 
-                    onStanToggle={handleStanToggle}
-                  />
-                ))}
               </div>
             </TabsContent>
           </Tabs>
@@ -390,7 +458,7 @@ export default function Home() {
           <div className="bg-muted rounded-lg p-4 border border-[#fec400]/20">
             <h3 className="font-bold text-lg mb-3">Popular Posts</h3>
             <div className="space-y-3">
-              {trendingPosts.slice(0, 3).map((post, index) => (
+              {explorePosts.slice(0, 3).map((post, index) => (
                 <div key={index} className="border-b border-[#fec400]/10 pb-3 last:border-0 last:pb-0">
                   <div className="flex items-center space-x-2 mb-1">
                     <Avatar className="h-6 w-6">
