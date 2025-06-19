@@ -51,7 +51,7 @@ export function IdolCard({ idol }: IdolCardProps) {
         <div className="h-32 bg-gradient-to-r from-primary/20 to-primary/40" />
         <CardContent className="pt-0 relative">
           <div className="absolute -top-12 left-4">
-            <Avatar className="h-24 w-24 border-4 border-background ring-2 ring-[#fec400]">
+            <Avatar className="h-24 w-24 ring-1 ring-[#fec400]">
               <AvatarImage src={idol.image || "/placeholder.svg"} alt={idol.name} />
               <AvatarFallback className="text-2xl">{idol.name.charAt(0)}</AvatarFallback>
             </Avatar>
