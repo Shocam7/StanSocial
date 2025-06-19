@@ -97,15 +97,20 @@ export default function Home() {
       try {
         const supabase = getSupabaseBrowser()
 
-        // Fetch user's stanned idols
-        const { data: stannedIdolIds, error: stannedError } = await supabase
-          .from("user_stanned_idols")
-          .select("idol_id")
-          .eq("user_id", currentUserId)
+        // Fetch user's stanned idol IDs from the array column
+        const { data: userData, error: userError } = await supabase
+          .from("users")
+          .select("stanned_idol_ids")
+          .eq("id", currentUserId)
+          .single()
 
-        if (stannedError) {
-          console.error("Error fetching stanned idols:", stannedError)
+        if (userError) {
+          console.error("Error fetching user data:", userError)
+          setError("Failed to fetch user data")
+          return
         }
+
+        const stannedIdolIds = userData?.stanned_idol_ids || []
 
         // Fetch all idols
         const { data: allIdols, error: idolsError } = await supabase
@@ -119,23 +124,24 @@ export default function Home() {
           return
         }
 
-        const stannedIdolIdSet = new Set(stannedIdolIds?.map(item => item.idol_id) || [])
+        const stannedIdolIdSet = new Set(stannedIdolIds)
         
         // Separate stanned and discover idols
         const stannedIdolsList: Idol[] = []
         const discoverIdolsList: Idol[] = []
 
         allIdols?.forEach(idol => {
+          const isStanned = stannedIdolIdSet.has(idol.id)
           const idolData: Idol = {
             id: idol.id,
             name: idol.name,
             image: idol.image,
             category: idol.category,
             stans: idol.stans,
-            isStanned: stannedIdolIdSet.has(idol.id)
+            isStanned
           }
 
-          if (stannedIdolIdSet.has(idol.id)) {
+          if (isStanned) {
             stannedIdolsList.push(idolData)
           } else {
             discoverIdolsList.push(idolData)
@@ -145,10 +151,8 @@ export default function Home() {
         setStannedIdols(stannedIdolsList)
         setDiscoverIdols(discoverIdolsList)
 
-        // Fetch posts from stanned idols
-        if (stannedIdolsList.length > 0) {
-          const stannedIdolIds = stannedIdolsList.map(idol => idol.id)
-          
+        // Fetch posts from stanned idols using the array of IDs
+        if (stannedIdolIds.length > 0) {
           const { data: posts, error: postsError } = await supabase
             .from("posts")
             .select("*")
@@ -196,6 +200,58 @@ export default function Home() {
 
     fetchData()
   }, [currentUserId])
+
+  // Function to handle stanning/unstanning idols
+  const handleStanToggle = async (idolId: string, isCurrentlyStanned: boolean) => {
+    try {
+      const supabase = getSupabaseBrowser()
+      
+      if (isCurrentlyStanned) {
+        // Unstan the idol
+        const { error } = await supabase.rpc('unstan_idol', {
+          user_uuid: currentUserId,
+          idol_uuid: idolId
+        })
+        
+        if (error) {
+          console.error("Error unstanning idol:", error)
+          return
+        }
+        
+        // Update local state
+        setStannedIdols(prev => prev.filter(idol => idol.id !== idolId))
+        setDiscoverIdols(prev => [...prev, { 
+          ...stannedIdols.find(idol => idol.id === idolId)!, 
+          isStanned: false,
+          stans: stannedIdols.find(idol => idol.id === idolId)!.stans - 1
+        }])
+        
+      } else {
+        // Stan the idol
+        const { error } = await supabase.rpc('stan_idol', {
+          user_uuid: currentUserId,
+          idol_uuid: idolId
+        })
+        
+        if (error) {
+          console.error("Error stanning idol:", error)
+          return
+        }
+        
+        // Update local state
+        const idolToStan = discoverIdols.find(idol => idol.id === idolId)!
+        setDiscoverIdols(prev => prev.filter(idol => idol.id !== idolId))
+        setStannedIdols(prev => [...prev, { 
+          ...idolToStan, 
+          isStanned: true,
+          stans: idolToStan.stans + 1
+        }])
+      }
+      
+    } catch (error) {
+      console.error("Error toggling stan status:", error)
+    }
+  }
 
   if (loading) {
     return (
@@ -268,7 +324,11 @@ export default function Home() {
                     <h3 className="text-lg font-semibold mb-3">Recommended Idols</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {discoverIdols.slice(0, 2).map((idol) => (
-                        <IdolCard key={idol.id} idol={idol} />
+                        <IdolCard 
+                          key={idol.id} 
+                          idol={idol} 
+                          onStanToggle={handleStanToggle}
+                        />
                       ))}
                     </div>
                   </div>
@@ -289,7 +349,11 @@ export default function Home() {
               <h2 className="text-xl font-bold mb-4">Discover New Idols to Stan</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {discoverIdols.map((idol) => (
-                  <IdolCard key={idol.id} idol={idol} />
+                  <IdolCard 
+                    key={idol.id} 
+                    idol={idol} 
+                    onStanToggle={handleStanToggle}
+                  />
                 ))}
               </div>
             </TabsContent>
