@@ -361,7 +361,7 @@ export default function Home() {
 
             <TabsContent value="new-for-you" className="mt-0 pt-16">
               <div className="p-4">
-                <h2 className="text-xl font-bold mb-4">Personalized For You</h2>
+                
                 <div className="space-y-6">
                   {/* Recommended Idols Carousel */}
                   <div>
