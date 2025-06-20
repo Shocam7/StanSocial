@@ -349,7 +349,13 @@ export default function Home() {
             <TabsContent value="feed" className="mt-0 pt-16">
               <div className="divide-y divide-[#fec400]/10">
                 {feedPosts.length > 0 ? (
-                  feedPosts.map((post) => <Post key={post.id} {...post} />)
+                  feedPosts.map((post) => (
+                    <Post 
+                      key={post.id} 
+                      {...post} 
+                      currentUserId={currentUserId} 
+                    />
+                  ))
                 ) : (
                   <div className="p-8 text-center">
                     <h3 className="font-semibold text-lg mb-2">No posts in your feed</h3>
@@ -438,7 +444,11 @@ export default function Home() {
                     <div className="divide-y divide-[#fec400]/10">
                       {explorePosts.length > 0 ? (
                         explorePosts.slice(0, 5).map((post) => (
-                          <Post key={post.id} {...post} />
+                          <Post 
+                            key={post.id} 
+                            {...post} 
+                            currentUserId={currentUserId} 
+                          />
                         ))
                       ) : (
                         <div className="p-8 text-center">
