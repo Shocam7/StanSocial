@@ -17,7 +17,7 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 
 interface PostProps extends PostType {
-  currentUserId?: 00000000-0000-0000-0000-000000000001 // Add this prop to identify the current user
+  currentUserId?: string // Add this prop to identify the current user
 }
 
 export function Post({ 
