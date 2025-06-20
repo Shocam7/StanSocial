@@ -41,9 +41,29 @@ export function Post({
   const [showNewCollectionForm, setShowNewCollectionForm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [creating, setCreating] = useState(false) // Add this state for create button
+  const [creating, setCreating] = useState(false)
+  const [isInCollections, setIsInCollections] = useState(false) // Track if post is in any collection
 
   const collectionsService = new CollectionsService()
+
+  // Load initial collection status when component mounts
+  useEffect(() => {
+    if (currentUserId) {
+      checkCollectionStatus()
+    }
+  }, [id, currentUserId])
+
+  // Check if this post is in any of the user's collections
+  const checkCollectionStatus = async () => {
+    if (!currentUserId) return
+
+    try {
+      const postCollections = await collectionsService.getCollectionsForPost(id, currentUserId)
+      setIsInCollections(postCollections.length > 0)
+    } catch (error) {
+      console.error("Error checking collection status:", error)
+    }
+  }
 
   // Load collections when dialog opens
   useEffect(() => {
@@ -137,6 +157,9 @@ export function Post({
         await collectionsService.removePostFromCollections(id, collectionsToRemove)
       }
 
+      // Update the collection status based on final selected collections
+      setIsInCollections(selectedCollections.length > 0)
+
       toast.success("Post saved to collections")
       setCollectionsDialogOpen(false)
       setSelectedCollections([])
@@ -221,7 +244,15 @@ export function Post({
             {currentUserId && (
               <Dialog open={collectionsDialogOpen} onOpenChange={setCollectionsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-[#fec400]">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className={`hover:text-[#fec400] ${
+                      isInCollections 
+                        ? "text-[#fec400]" 
+                        : "text-muted-foreground"
+                    }`}
+                  >
                     <BookmarkPlus className="h-4 w-4" />
                   </Button>
                 </DialogTrigger>
