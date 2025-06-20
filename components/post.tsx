@@ -249,7 +249,7 @@ export function Post({
                     size="sm" 
                     className={`hover:text-[#fec400] ${
                       isInCollections 
-                        ? "text-[#fec400]" 
+                        ? "fill-green-600 text-white" 
                         : "text-muted-foreground"
                     }`}
                   >
