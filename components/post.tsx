@@ -1,6 +1,6 @@
 "use client"
 
-import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, BookmarkPlus, Plus, Lock, Globe } from "lucide-react"
+import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, BookmarkPlus, Plus, Lock, Globe, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
@@ -10,24 +10,66 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
-import type { Post as PostType } from "@/types"
+import { toast } from "sonner"
+import type { Post as PostType, Collection } from "@/types"
+import { CollectionsService } from "@/lib/collections-service"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
-// Sample collections data - in a real app, this would come from your data store
-const sampleCollections = [
-  { id: "1", name: "Favorites", isPublic: false, postCount: 12 },
-  { id: "2", name: "Workout Motivation", isPublic: true, postCount: 8 },
-  { id: "3", name: "Funny Posts", isPublic: true, postCount: 24 },
-]
+interface PostProps extends PostType {
+  currentUserId?: string // Add this prop to identify the current user
+}
 
-export function Post({ user, content, image, timestamp, likes, comments, reposts, liked = false, idol }: PostType) {
+export function Post({ 
+  id,
+  user, 
+  content, 
+  image, 
+  timestamp, 
+  likes, 
+  comments, 
+  reposts, 
+  liked = false, 
+  idol,
+  currentUserId 
+}: PostProps) {
   const [collectionsDialogOpen, setCollectionsDialogOpen] = useState(false)
-  const [collections, setCollections] = useState(sampleCollections)
+  const [collections, setCollections] = useState<Collection[]>([])
   const [selectedCollections, setSelectedCollections] = useState<string[]>([])
   const [newCollectionName, setNewCollectionName] = useState("")
   const [newCollectionVisibility, setNewCollectionVisibility] = useState("private")
   const [showNewCollectionForm, setShowNewCollectionForm] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  const collectionsService = new CollectionsService()
+
+  // Load collections when dialog opens
+  useEffect(() => {
+    if (collectionsDialogOpen && currentUserId) {
+      loadCollections()
+    }
+  }, [collectionsDialogOpen, currentUserId])
+
+  const loadCollections = async () => {
+    if (!currentUserId) return
+
+    setLoading(true)
+    try {
+      const [userCollections, postCollections] = await Promise.all([
+        collectionsService.getUserCollections(currentUserId),
+        collectionsService.getCollectionsForPost(id, currentUserId)
+      ])
+
+      setCollections(userCollections)
+      setSelectedCollections(postCollections)
+    } catch (error) {
+      console.error("Error loading collections:", error)
+      toast.error("Failed to load collections")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleCollectionToggle = (collectionId: string) => {
     setSelectedCollections(prev => 
@@ -37,27 +79,70 @@ export function Post({ user, content, image, timestamp, likes, comments, reposts
     )
   }
 
-  const handleCreateCollection = () => {
-    if (newCollectionName.trim()) {
-      const newCollection = {
-        id: Date.now().toString(),
-        name: newCollectionName.trim(),
-        isPublic: newCollectionVisibility === "public",
-        postCount: 0
+  const handleCreateCollection = async () => {
+    if (!currentUserId || !newCollectionName.trim()) return
+
+    try {
+      const newCollection = await collectionsService.createCollection(
+        currentUserId,
+        newCollectionName,
+        newCollectionVisibility === "public"
+      )
+
+      if (newCollection) {
+        setCollections(prev => [newCollection, ...prev])
+        setSelectedCollections(prev => [...prev, newCollection.id])
+        setNewCollectionName("")
+        setShowNewCollectionForm(false)
+        toast.success("Collection created successfully")
+      } else {
+        toast.error("Failed to create collection")
       }
-      setCollections(prev => [...prev, newCollection])
-      setSelectedCollections(prev => [...prev, newCollection.id])
-      setNewCollectionName("")
-      setShowNewCollectionForm(false)
+    } catch (error) {
+      console.error("Error creating collection:", error)
+      toast.error("Failed to create collection")
     }
   }
 
-  const handleSaveToCollections = () => {
-    // In a real app, you would save the post to the selected collections here
-    console.log("Saving post to collections:", selectedCollections)
+  const handleSaveToCollections = async () => {
+    if (!currentUserId) return
+
+    setSaving(true)
+    try {
+      // Get the original collections for this post
+      const originalCollections = await collectionsService.getCollectionsForPost(id, currentUserId)
+      
+      // Determine which collections to add to and remove from
+      const collectionsToAdd = selectedCollections.filter(id => !originalCollections.includes(id))
+      const collectionsToRemove = originalCollections.filter(id => !selectedCollections.includes(id))
+
+      // Add to new collections
+      if (collectionsToAdd.length > 0) {
+        await collectionsService.addPostToCollections(id, collectionsToAdd)
+      }
+
+      // Remove from old collections
+      if (collectionsToRemove.length > 0) {
+        await collectionsService.removePostFromCollections(id, collectionsToRemove)
+      }
+
+      toast.success("Post saved to collections")
+      setCollectionsDialogOpen(false)
+      setSelectedCollections([])
+      setShowNewCollectionForm(false)
+    } catch (error) {
+      console.error("Error saving to collections:", error)
+      toast.error("Failed to save to collections")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDialogClose = () => {
     setCollectionsDialogOpen(false)
     setSelectedCollections([])
     setShowNewCollectionForm(false)
+    setNewCollectionName("")
   }
 
   return (
@@ -115,132 +200,152 @@ export function Post({ user, content, image, timestamp, likes, comments, reposts
             </Button>
 
             {/* Add to Collections Button */}
-            <Dialog open={collectionsDialogOpen} onOpenChange={setCollectionsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-[#fec400]">
-                  <BookmarkPlus className="h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Add to Collection</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  {/* Existing Collections */}
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium">Your Collections</Label>
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {collections.map((collection) => (
-                        <div key={collection.id} className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-50">
-                          <Checkbox
-                            id={collection.id}
-                            checked={selectedCollections.includes(collection.id)}
-                            onCheckedChange={() => handleCollectionToggle(collection.id)}
-                          />
-                          <div className="flex-1 min-w-0">
-                            <Label
-                              htmlFor={collection.id}
-                              className="flex items-center space-x-2 cursor-pointer"
-                            >
-                              <span className="truncate">{collection.name}</span>
-                              {collection.isPublic ? (
-                                <Globe className="h-3 w-3 text-green-600" />
-                              ) : (
-                                <Lock className="h-3 w-3 text-gray-500" />
-                              )}
-                            </Label>
-                            <p className="text-xs text-muted-foreground">
-                              {collection.postCount} posts
-                            </p>
+            {currentUserId && (
+              <Dialog open={collectionsDialogOpen} onOpenChange={setCollectionsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-[#fec400]">
+                    <BookmarkPlus className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Add to Collection</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    {loading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                      </div>
+                    ) : (
+                      <>
+                        {/* Existing Collections */}
+                        {collections.length > 0 && (
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">Your Collections</Label>
+                            <div className="space-y-2 max-h-48 overflow-y-auto">
+                              {collections.map((collection) => (
+                                <div key={collection.id} className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-50">
+                                  <Checkbox
+                                    id={collection.id}
+                                    checked={selectedCollections.includes(collection.id)}
+                                    onCheckedChange={() => handleCollectionToggle(collection.id)}
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <Label
+                                      htmlFor={collection.id}
+                                      className="flex items-center space-x-2 cursor-pointer"
+                                    >
+                                      <span className="truncate">{collection.name}</span>
+                                      {collection.isPublic ? (
+                                        <Globe className="h-3 w-3 text-green-600" />
+                                      ) : (
+                                        <Lock className="h-3 w-3 text-gray-500" />
+                                      )}
+                                    </Label>
+                                    <p className="text-xs text-muted-foreground">
+                                      {collection.postCount} posts
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
+                        )}
+
+                        {/* Create New Collection */}
+                        {!showNewCollectionForm ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowNewCollectionForm(true)}
+                            className="w-full"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Create New Collection
+                          </Button>
+                        ) : (
+                          <div className="space-y-3 p-3 border rounded-md bg-gray-50">
+                            <div>
+                              <Label htmlFor="collection-name" className="text-sm">Collection Name</Label>
+                              <Input
+                                id="collection-name"
+                                value={newCollectionName}
+                                onChange={(e) => setNewCollectionName(e.target.value)}
+                                placeholder="Enter collection name"
+                                className="mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-sm">Visibility</Label>
+                              <RadioGroup
+                                value={newCollectionVisibility}
+                                onValueChange={setNewCollectionVisibility}
+                                className="mt-1"
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="private" id="private" />
+                                  <Label htmlFor="private" className="flex items-center space-x-1">
+                                    <Lock className="h-3 w-3" />
+                                    <span>Private</span>
+                                  </Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="public" id="public" />
+                                  <Label htmlFor="public" className="flex items-center space-x-1">
+                                    <Globe className="h-3 w-3" />
+                                    <span>Public</span>
+                                  </Label>
+                                </div>
+                              </RadioGroup>
+                            </div>
+                            <div className="flex space-x-2">
+                              <Button size="sm" onClick={handleCreateCollection}>
+                                Create
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setShowNewCollectionForm(false)
+                                  setNewCollectionName("")
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className="flex space-x-2 pt-2">
+                          <Button
+                            onClick={handleSaveToCollections}
+                            disabled={saving}
+                            className="flex-1"
+                          >
+                            {saving ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Saving...
+                              </>
+                            ) : (
+                              `Save to Collections (${selectedCollections.length})`
+                            )}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={handleDialogClose}
+                            disabled={saving}
+                          >
+                            Cancel
+                          </Button>
                         </div>
-                      ))}
-                    </div>
+                      </>
+                    )}
                   </div>
-
-                  {/* Create New Collection */}
-                  {!showNewCollectionForm ? (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowNewCollectionForm(true)}
-                      className="w-full"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create New Collection
-                    </Button>
-                  ) : (
-                    <div className="space-y-3 p-3 border rounded-md bg-gray-50">
-                      <div>
-                        <Label htmlFor="collection-name" className="text-sm">Collection Name</Label>
-                        <Input
-                          id="collection-name"
-                          value={newCollectionName}
-                          onChange={(e) => setNewCollectionName(e.target.value)}
-                          placeholder="Enter collection name"
-                          className="mt-1"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-sm">Visibility</Label>
-                        <RadioGroup
-                          value={newCollectionVisibility}
-                          onValueChange={setNewCollectionVisibility}
-                          className="mt-1"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="private" id="private" />
-                            <Label htmlFor="private" className="flex items-center space-x-1">
-                              <Lock className="h-3 w-3" />
-                              <span>Private</span>
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="public" id="public" />
-                            <Label htmlFor="public" className="flex items-center space-x-1">
-                              <Globe className="h-3 w-3" />
-                              <span>Public</span>
-                            </Label>
-                          </div>
-                        </RadioGroup>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button size="sm" onClick={handleCreateCollection}>
-                          Create
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setShowNewCollectionForm(false)
-                            setNewCollectionName("")
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Action Buttons */}
-                  <div className="flex space-x-2 pt-2">
-                    <Button
-                      onClick={handleSaveToCollections}
-                      disabled={selectedCollections.length === 0}
-                      className="flex-1"
-                    >
-                      Save to Collections ({selectedCollections.length})
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setCollectionsDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+                </DialogContent>
+              </Dialog>
+            )}
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

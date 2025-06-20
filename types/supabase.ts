@@ -3,6 +3,77 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export interface Database {
   public: {
     Tables: {
+      collections: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          is_public: boolean
+          user_id: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          is_public?: boolean
+          user_id: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          is_public?: boolean
+          user_id?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collections_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      collection_posts: {
+        Row: {
+          id: string
+          collection_id: string
+          post_id: string
+          added_at: string
+        }
+        Insert: {
+          id?: string
+          collection_id: string
+          post_id: string
+          added_at?: string
+        }
+        Update: {
+          id?: string
+          collection_id?: string
+          post_id?: string
+          added_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_posts_collection_id_fkey"
+            columns: ["collection_id"]
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_posts_post_id_fkey"
+            columns: ["post_id"]
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       idols: {
         Row: {
           id: string
@@ -185,7 +256,12 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_collection_post_count: {
+        Args: {
+          collection_id: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never

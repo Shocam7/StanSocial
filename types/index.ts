@@ -15,6 +15,17 @@ export interface User {
   stannedIdols: string[]
 }
 
+export interface Collection {
+  id: string
+  name: string
+  description?: string
+  isPublic: boolean
+  postCount: number
+  userId: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface Post {
   id: string
   content: string
