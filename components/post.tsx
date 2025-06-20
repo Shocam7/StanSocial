@@ -41,6 +41,7 @@ export function Post({
   const [showNewCollectionForm, setShowNewCollectionForm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [creating, setCreating] = useState(false) // Add this state for create button
 
   const collectionsService = new CollectionsService()
 
@@ -80,19 +81,27 @@ export function Post({
   }
 
   const handleCreateCollection = async () => {
-    if (!currentUserId || !newCollectionName.trim()) return
+    if (!currentUserId || !newCollectionName.trim()) {
+      toast.error("Please enter a collection name")
+      return
+    }
 
+    setCreating(true)
     try {
       const newCollection = await collectionsService.createCollection(
         currentUserId,
-        newCollectionName,
+        newCollectionName.trim(),
         newCollectionVisibility === "public"
       )
 
       if (newCollection) {
+        // Add the new collection to the list
         setCollections(prev => [newCollection, ...prev])
+        // Auto-select the new collection
         setSelectedCollections(prev => [...prev, newCollection.id])
+        // Reset form
         setNewCollectionName("")
+        setNewCollectionVisibility("private")
         setShowNewCollectionForm(false)
         toast.success("Collection created successfully")
       } else {
@@ -101,6 +110,8 @@ export function Post({
     } catch (error) {
       console.error("Error creating collection:", error)
       toast.error("Failed to create collection")
+    } finally {
+      setCreating(false)
     }
   }
 
@@ -143,6 +154,13 @@ export function Post({
     setSelectedCollections([])
     setShowNewCollectionForm(false)
     setNewCollectionName("")
+    setNewCollectionVisibility("private")
+  }
+
+  const handleCancelNewCollection = () => {
+    setShowNewCollectionForm(false)
+    setNewCollectionName("")
+    setNewCollectionVisibility("private")
   }
 
   return (
@@ -273,6 +291,11 @@ export function Post({
                                 onChange={(e) => setNewCollectionName(e.target.value)}
                                 placeholder="Enter collection name"
                                 className="mt-1"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' && !creating && newCollectionName.trim()) {
+                                    handleCreateCollection()
+                                  }
+                                }}
                               />
                             </div>
                             <div>
@@ -299,16 +322,25 @@ export function Post({
                               </RadioGroup>
                             </div>
                             <div className="flex space-x-2">
-                              <Button size="sm" onClick={handleCreateCollection}>
-                                Create
+                              <Button 
+                                size="sm" 
+                                onClick={handleCreateCollection}
+                                disabled={creating || !newCollectionName.trim()}
+                              >
+                                {creating ? (
+                                  <>
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                    Creating...
+                                  </>
+                                ) : (
+                                  'Create'
+                                )}
                               </Button>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => {
-                                  setShowNewCollectionForm(false)
-                                  setNewCollectionName("")
-                                }}
+                                onClick={handleCancelNewCollection}
+                                disabled={creating}
                               >
                                 Cancel
                               </Button>
@@ -320,7 +352,7 @@ export function Post({
                         <div className="flex space-x-2 pt-2">
                           <Button
                             onClick={handleSaveToCollections}
-                            disabled={saving}
+                            disabled={saving || creating}
                             className="flex-1"
                           >
                             {saving ? (
@@ -335,7 +367,7 @@ export function Post({
                           <Button
                             variant="outline"
                             onClick={handleDialogClose}
-                            disabled={saving}
+                            disabled={saving || creating}
                           >
                             Cancel
                           </Button>
