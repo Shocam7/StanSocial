@@ -249,11 +249,15 @@ export function Post({
                     size="sm" 
                     className={`hover:text-[#fec400] ${
                       isInCollections 
-                        ? "fill-green-600 text-white" 
+                        ? "text-white" 
                         : "text-muted-foreground"
                     }`}
                   >
-                    <BookmarkPlus className="h-4 w-4" />
+                    <BookmarkPlus
+  className={`h-4 w-4 ${isInCollections ? "text-green-600" : ""}`}
+  fill={isInCollections ? "green" : "none"}
+  stroke={isInCollections ? "white" : "muted-foreground"}
+/>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
