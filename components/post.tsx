@@ -1,6 +1,6 @@
 "use client"
 
-import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Bookmark, Plus, Lock, Globe, Loader2 } from "lucide-react"
+import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, BookmarkPlus, Plus, Lock, Globe, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
@@ -244,21 +244,19 @@ export function Post({
             {currentUserId && (
               <Dialog open={collectionsDialogOpen} onOpenChange={setCollectionsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className={`hover:text-[#fec400] ${
-                      isInCollections 
-                        ? "text-white" 
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    <Bookmark
-  className={`h-4 w-4 ${isInCollections ? "text-green-600" : ""}`}
-  fill={isInCollections ? "green" : "none"}
-  stroke={isInCollections ? "white" : "muted-foreground"}
-/>
-                  </Button>
+<Button 
+  variant="ghost" 
+  size="sm"
+>
+  <Bookmark
+    className={`h-4 w-4 transition-colors ${
+      isInCollections
+        ? "fill-green-600 text-white"
+        : "fill-muted text-muted-foreground"
+    } hover:fill-green-600`}
+  />
+</Button>
+
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
