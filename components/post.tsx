@@ -1,6 +1,6 @@
 "use client"
 
-import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, BookmarkPlus, Plus, Lock, Globe, Loader2 } from "lucide-react"
+import { Heart, MessageCircle, Repeat2, Share, MoreHorizontal, Bookmark, Plus, Lock, Globe, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
@@ -253,7 +253,7 @@ export function Post({
                         : "text-muted-foreground"
                     }`}
                   >
-                    <BookmarkPlus
+                    <Bookmark
   className={`h-4 w-4 ${isInCollections ? "text-green-600" : ""}`}
   fill={isInCollections ? "green" : "none"}
   stroke={isInCollections ? "white" : "muted-foreground"}
