@@ -39,46 +39,6 @@ function getRelativeTimeString(date: Date): string {
   return `${Math.floor(diffInSeconds / 86400)}d`
 }
 
-// Optimized function to batch convert database posts
-const mapDatabasePostsToPosts = async (posts: any[], usersMap: Map<string, any>, idolsMap: Map<string, any>): Promise<PostType[]> => {
-  return posts.map(post => {
-    const userData = usersMap.get(post.user_id)
-    const idolData = idolsMap.get(post.idol_id)
-
-    const user = userData
-      ? {
-          name: userData.name,
-          username: userData.username,
-          avatar: userData.avatar,
-        }
-      : { name: "Unknown User", username: "unknown", avatar: "" }
-
-    const idol = idolData
-      ? {
-          id: idolData.id,
-          name: idolData.name,
-          image: idolData.image,
-          category: idolData.category,
-          stans: idolData.stans,
-        }
-      : { id: "", name: "Unknown Idol", image: "", category: "", stans: 0 }
-
-    const timestamp = getRelativeTimeString(new Date(post.created_at))
-
-    return {
-      id: post.id,
-      content: post.content || post.title || post.poll_question || "",
-      image: post.image || undefined,
-      timestamp,
-      likes: post.likes,
-      comments: post.comments,
-      reposts: post.reposts,
-      user,
-      idol,
-    }
-  })
-}
-
 export default function Home() {
   const [stannedIdols, setStannedIdols] = useState<Idol[]>([])
   const [feedPosts, setFeedPosts] = useState<PostType[]>([])
@@ -105,22 +65,21 @@ export default function Home() {
       try {
         const supabase = getSupabaseBrowser()
 
-        // Fetch user's stanned idol IDs from the array column
-        const { data: userData, error: userError } = await supabase
-          .from("users")
-          .select("stanned_idol_ids")
-          .eq("id", currentUserId)
-          .single()
+        // Fetch user's stanned idol IDs using the junction table
+        const { data: stannedIdolsData, error: stannedError } = await supabase
+          .from("user_stanned_idols")
+          .select("idol_id")
+          .eq("user_id", currentUserId)
 
-        if (userError) {
-          console.error("Error fetching user data:", userError)
-          setError("Failed to fetch user data")
+        if (stannedError) {
+          console.error("Error fetching stanned idols:", stannedError)
+          setError("Failed to fetch stanned idols")
           return
         }
 
-        const stannedIdolIds = userData?.stanned_idol_ids || []
+        const stannedIdolIds = stannedIdolsData?.map(item => item.idol_id) || []
 
-        // Fetch all idols
+        // Fetch all idols with their stan counts
         const { data: allIdols, error: idolsError } = await supabase
           .from("idols")
           .select("*")
@@ -244,45 +203,72 @@ export default function Home() {
     fetchData()
   }, [currentUserId])
 
-  // Function to handle stanning/unstanning idols
+  // Function to handle stanning/unstanning idols using the junction table
   const handleStanToggle = async (idolId: string, isCurrentlyStanned: boolean) => {
     try {
       const supabase = getSupabaseBrowser()
       
       if (isCurrentlyStanned) {
-        // Unstan the idol
-        const { error } = await supabase.rpc('unstan_idol', {
-          user_uuid: currentUserId,
-          idol_uuid: idolId
-        })
+        // Unstan the idol - remove from junction table and decrement idol stans
+        const [junctionResult, idolResult] = await Promise.all([
+          supabase
+            .from("user_stanned_idols")
+            .delete()
+            .eq("user_id", currentUserId)
+            .eq("idol_id", idolId),
+          supabase
+            .from("idols")
+            .update({ stans: Math.max(0, stannedIdols.find(idol => idol.id === idolId)!.stans - 1) })
+            .eq("id", idolId)
+        ])
         
-        if (error) {
-          console.error("Error unstanning idol:", error)
+        if (junctionResult.error) {
+          console.error("Error unstanning idol:", junctionResult.error)
+          return
+        }
+        
+        if (idolResult.error) {
+          console.error("Error updating idol stans:", idolResult.error)
           return
         }
         
         // Update local state
+        const unstannedIdol = stannedIdols.find(idol => idol.id === idolId)!
         setStannedIdols(prev => prev.filter(idol => idol.id !== idolId))
         setDiscoverIdols(prev => [...prev, { 
-          ...stannedIdols.find(idol => idol.id === idolId)!, 
+          ...unstannedIdol, 
           isStanned: false,
-          stans: stannedIdols.find(idol => idol.id === idolId)!.stans - 1
+          stans: Math.max(0, unstannedIdol.stans - 1)
         }])
         
       } else {
-        // Stan the idol
-        const { error } = await supabase.rpc('stan_idol', {
-          user_uuid: currentUserId,
-          idol_uuid: idolId
-        })
+        // Stan the idol - add to junction table and increment idol stans
+        const idolToStan = discoverIdols.find(idol => idol.id === idolId)!
         
-        if (error) {
-          console.error("Error stanning idol:", error)
+        const [junctionResult, idolResult] = await Promise.all([
+          supabase
+            .from("user_stanned_idols")
+            .insert({
+              user_id: currentUserId,
+              idol_id: idolId
+            }),
+          supabase
+            .from("idols")
+            .update({ stans: idolToStan.stans + 1 })
+            .eq("id", idolId)
+        ])
+        
+        if (junctionResult.error) {
+          console.error("Error stanning idol:", junctionResult.error)
+          return
+        }
+        
+        if (idolResult.error) {
+          console.error("Error updating idol stans:", idolResult.error)
           return
         }
         
         // Update local state
-        const idolToStan = discoverIdols.find(idol => idol.id === idolId)!
         setDiscoverIdols(prev => prev.filter(idol => idol.id !== idolId))
         setStannedIdols(prev => [...prev, { 
           ...idolToStan, 
