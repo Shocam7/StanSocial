@@ -2,8 +2,9 @@ import { getSupabaseServer } from "@/lib/supabase"
 import { Header } from "@/components/header"
 import { DiscoverGrid } from "@/components/discover/discover-grid"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Filter } from "lucide-react"
+import { Search, Sparkles, TrendingUp, Image, Video, BarChart3, MessageCircle } from "lucide-react"
 import { FloatingNavButton } from "@/components/floating-nav-button"
 import type { Idol, DiscoverPost } from "@/types"
 
@@ -44,7 +45,7 @@ export default async function DiscoverPage() {
 
   const stannedIdols = idols.filter((idol) => idol.isStanned)
 
-  // Fetch posts with related data
+  // Fetch ALL posts (trending on platform regardless of stanned status)
   const { data: postsData } = await supabase.from("posts").select("*").order("trending_score", { ascending: false })
 
   // Transform posts data
@@ -119,94 +120,114 @@ export default async function DiscoverPage() {
       <FloatingNavButton />
       <Header stannedIdols={stannedIdols} />
 
-      <div className="container mx-auto flex flex-col md:flex-row">
-        <main className="flex-1 max-w-full md:max-w-4xl border-x border-[#fec400]/20">
-          <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-[#fec400]/40 p-4">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h1 className="text-2xl font-bold">Discover</h1>
-                <p className="text-muted-foreground text-sm">Discover trending content about your favorite idols</p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-[#fec400] text-[#fec400] hover:bg-[#fec400] hover:text-black"
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                Filter
-              </Button>
+      <div className="container mx-auto max-w-6xl px-4">
+        {/* Search Header Section */}
+        <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 py-6 border-b border-[#fec400]/20">
+          <div className="flex flex-col space-y-4">
+            <div className="text-center">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-[#fec400] to-orange-400 bg-clip-text text-transparent">
+                Discover
+              </h1>
+              <p className="text-muted-foreground mt-1">Trending content from across the platform</p>
+            </div>
+            
+            {/* Search Bar */}
+            <div className="relative max-w-md mx-auto w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search posts, idols, users..."
+                className="pl-10 pr-4 py-2 rounded-full border-[#fec400]/30 focus:border-[#fec400] focus:ring-[#fec400]/20"
+              />
             </div>
 
-            <Tabs defaultValue="trending">
-              <TabsList className="w-full md:w-auto">
-                <TabsTrigger value="trending">Trending</TabsTrigger>
-                <TabsTrigger value="images">Images</TabsTrigger>
-                <TabsTrigger value="videos">Videos</TabsTrigger>
-                <TabsTrigger value="polls">Polls</TabsTrigger>
-                <TabsTrigger value="discussions">Discussions</TabsTrigger>
+            {/* Icon-based Tabs */}
+            <Tabs defaultValue="vibe" className="w-full">
+              <TabsList className="grid grid-cols-6 w-full max-w-lg mx-auto bg-muted/50 p-1 rounded-full">
+                <TabsTrigger 
+                  value="vibe" 
+                  className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
+                  title="Vibe"
+                >
+                  <Sparkles className="h-5 w-5" />
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="trending" 
+                  className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
+                  title="Trending"
+                >
+                  <TrendingUp className="h-5 w-5" />
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="images" 
+                  className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
+                  title="Images"
+                >
+                  <Image className="h-5 w-5" />
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="videos" 
+                  className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
+                  title="Videos"
+                >
+                  <Video className="h-5 w-5" />
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="polls" 
+                  className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
+                  title="Polls"
+                >
+                  <BarChart3 className="h-5 w-5" />
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="discussions" 
+                  className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
+                  title="Discussions"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="trending" className="mt-0">
-                <DiscoverGrid posts={discoverPosts} />
-              </TabsContent>
-              <TabsContent value="images" className="mt-0">
-                <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "image")} />
-              </TabsContent>
-              <TabsContent value="videos" className="mt-0">
-                <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "video")} />
-              </TabsContent>
-              <TabsContent value="polls" className="mt-0">
-                <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "poll")} />
-              </TabsContent>
-              <TabsContent value="discussions" className="mt-0">
-                <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "discussion")} />
-              </TabsContent>
+              {/* Tab Content with Instagram-like Grid */}
+              <div className="mt-8">
+                <TabsContent value="vibe" className="mt-0">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    <DiscoverGrid posts={discoverPosts} />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="trending" className="mt-0">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    <DiscoverGrid posts={discoverPosts} />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="images" className="mt-0">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "image")} />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="videos" className="mt-0">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "video")} />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="polls" className="mt-0">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "poll")} />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="discussions" className="mt-0">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "discussion")} />
+                  </div>
+                </TabsContent>
+              </div>
             </Tabs>
           </div>
-        </main>
-
-        {/* Right sidebar - hidden on mobile and tablet */}
-        <aside className="hidden xl:block w-80 p-4 space-y-4">
-          <div className="bg-muted rounded-lg p-4 border border-[#fec400]/20">
-            <h3 className="font-bold text-lg mb-3">Trending Categories</h3>
-            <div className="space-y-2">
-              {[
-                { category: "Music", posts: "2.5K posts", trend: "+15%" },
-                { category: "K-Pop", posts: "1.8K posts", trend: "+23%" },
-                { category: "Acting", posts: "890 posts", trend: "+8%" },
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center p-2 hover:bg-background rounded border border-transparent hover:border-[#fec400]/20"
-                >
-                  <div>
-                    <p className="font-medium">{item.category}</p>
-                    <p className="text-xs text-muted-foreground">{item.posts}</p>
-                  </div>
-                  <span className="text-xs text-green-600 font-medium">{item.trend}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-muted rounded-lg p-4 border border-[#fec400]/20">
-            <h3 className="font-bold text-lg mb-3">Post Types</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { type: "Images", count: "1.2K", icon: "🖼️" },
-                { type: "Videos", count: "856", icon: "🎥" },
-                { type: "Polls", count: "234", icon: "📊" },
-                { type: "Discussions", count: "445", icon: "💬" },
-              ].map((item, index) => (
-                <div key={index} className="text-center p-3 bg-background rounded border border-[#fec400]/20">
-                  <div className="text-2xl mb-1">{item.icon}</div>
-                  <p className="font-medium text-sm">{item.type}</p>
-                  <p className="text-xs text-muted-foreground">{item.count}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </aside>
+        </div>
       </div>
     </div>
   )
