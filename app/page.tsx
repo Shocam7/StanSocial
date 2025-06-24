@@ -12,6 +12,8 @@ import { FloatingNavButton } from "@/components/floating-nav-button"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { getSupabaseBrowser } from "@/lib/supabase"
+import { ProtectedRoute } from "@/components/auth/protected-route"
+import { useAuth } from "@/hooks/use-auth"
 import type { Idol, Post as PostType, DiscoverPost } from "@/types"
 
 // Convert DiscoverPost to PostType for compatibility
@@ -39,7 +41,8 @@ function getRelativeTimeString(date: Date): string {
   return `${Math.floor(diffInSeconds / 86400)}d`
 }
 
-export default function Home() {
+function HomeContent() {
+  const { user } = useAuth()
   const [stannedIdols, setStannedIdols] = useState<Idol[]>([])
   const [feedPosts, setFeedPosts] = useState<PostType[]>([])
   const [discoverIdols, setDiscoverIdols] = useState<Idol[]>([])
@@ -48,8 +51,8 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [carouselIndex, setCarouselIndex] = useState(0)
 
-  // For now, we'll use a mock user ID. In a real app, this would come from authentication
-  const currentUserId = "00000000-0000-0000-0000-000000000001" // Replace with actual user ID from auth
+  // Get current user ID from auth
+  const currentUserId = user?.id || ""
 
   // Carousel navigation
   const nextSlide = () => {
@@ -61,6 +64,8 @@ export default function Home() {
   }
 
   useEffect(() => {
+    if (!user) return
+
     const fetchData = async () => {
       try {
         const supabase = getSupabaseBrowser()
@@ -201,10 +206,12 @@ export default function Home() {
     }
 
     fetchData()
-  }, [currentUserId])
+  }, [currentUserId, user])
 
   // Function to handle stanning/unstanning idols using the junction table
   const handleStanToggle = async (idolId: string, isCurrentlyStanned: boolean) => {
+    if (!user) return
+
     try {
       const supabase = getSupabaseBrowser()
       
@@ -491,5 +498,13 @@ export default function Home() {
         </aside>
       </div>
     </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <ProtectedRoute>
+      <HomeContent />
+    </ProtectedRoute>
   )
 }
