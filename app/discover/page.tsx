@@ -1,10 +1,9 @@
 import { getSupabaseServer } from "@/lib/supabase"
 import { Header } from "@/components/header"
 import { DiscoverGrid } from "@/components/discover/discover-grid"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { SearchBar } from "@/components/search-bar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, Sparkles, TrendingUp, Image, Video, BarChart3, MessageCircle } from "lucide-react"
+import { Sparkles, TrendingUp, Image, Video, BarChart3, MessageCircle } from "lucide-react"
 import { FloatingNavButton } from "@/components/floating-nav-button"
 import type { Idol, DiscoverPost } from "@/types"
 
@@ -124,21 +123,8 @@ export default async function DiscoverPage() {
         {/* Search Header Section */}
         <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 py-6 border-b border-[#fec400]/20">
           <div className="flex flex-col space-y-4">
-            <div className="text-center">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-[#fec400] to-orange-400 bg-clip-text text-transparent">
-                Discover
-              </h1>
-              <p className="text-muted-foreground mt-1">Trending content from across the platform</p>
-            </div>
-            
-            {/* Search Bar */}
-            <div className="relative max-w-md mx-auto w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search posts, idols, users..."
-                className="pl-10 pr-4 py-2 rounded-full border-[#fec400]/30 focus:border-[#fec400] focus:ring-[#fec400]/20"
-              />
-            </div>
+            {/* Search Bar Component */}
+            <SearchBar />
 
             {/* Icon-based Tabs */}
             <Tabs defaultValue="vibe" className="w-full">
