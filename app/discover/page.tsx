@@ -25,7 +25,7 @@ export default async function DiscoverPage() {
     // Handle navigation to idol or user profile
     if (result.type === 'idol') {
       // Navigate to idol profile
-      window.location.href = `/idol/${result.id}`
+      window.location.href = `/idol/${idolSlug}`
     } else {
       // Navigate to user profile
       window.location.href = `/user/${result.username}`
@@ -131,99 +131,98 @@ export default async function DiscoverPage() {
       <Header stannedIdols={stannedIdols} />
 
       <div className="container mx-auto max-w-6xl px-4">
-        {/* Search Header Section */}
-        <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 py-6 border-b border-[#fec400]/20">
-          <div className="flex flex-col space-y-4">
-            {/* Search Bar Component */}
-            <SearchWrapper />
+        {/* Search Bar - Sticky */}
+        <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-20 py-4 border-b border-[#fec400]/10">
+          <SearchWrapper />
+        </div>
 
-            {/* Icon-based Tabs */}
-            <Tabs defaultValue="vibe" className="w-full">
-              <TabsList className="grid grid-cols-6 w-full max-w-lg mx-auto bg-muted/50 p-1 rounded-full">
-                <TabsTrigger 
-                  value="vibe" 
-                  className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
-                  title="Vibe"
-                >
-                  <Sparkles className="h-5 w-5" />
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="trending" 
-                  className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
-                  title="Trending"
-                >
-                  <TrendingUp className="h-5 w-5" />
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="images" 
-                  className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
-                  title="Images"
-                >
-                  <Image className="h-5 w-5" />
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="videos" 
-                  className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
-                  title="Videos"
-                >
-                  <Video className="h-5 w-5" />
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="polls" 
-                  className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
-                  title="Polls"
-                >
-                  <BarChart3 className="h-5 w-5" />
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="discussions" 
-                  className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
-                  title="Discussions"
-                >
-                  <MessageCircle className="h-5 w-5" />
-                </TabsTrigger>
-              </TabsList>
+        {/* Icon-based Tabs - Sticky */}
+        <div className="sticky top-[72px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 py-4 border-b border-[#fec400]/20">
+          <Tabs defaultValue="vibe" className="w-full">
+            <TabsList className="grid grid-cols-6 w-full max-w-lg mx-auto bg-muted/50 p-1 rounded-full">
+              <TabsTrigger 
+                value="vibe" 
+                className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
+                title="Vibe"
+              >
+                <Sparkles className="h-5 w-5" />
+              </TabsTrigger>
+              <TabsTrigger 
+                value="trending" 
+                className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
+                title="Trending"
+              >
+                <TrendingUp className="h-5 w-5" />
+              </TabsTrigger>
+              <TabsTrigger 
+                value="images" 
+                className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
+                title="Images"
+              >
+                <Image className="h-5 w-5" />
+              </TabsTrigger>
+              <TabsTrigger 
+                value="videos" 
+                className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
+                title="Videos"
+              >
+                <Video className="h-5 w-5" />
+              </TabsTrigger>
+              <TabsTrigger 
+                value="polls" 
+                className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
+                title="Polls"
+              >
+                <BarChart3 className="h-5 w-5" />
+              </TabsTrigger>
+              <TabsTrigger 
+                value="discussions" 
+                className="rounded-full data-[state=active]:bg-[#fec400] data-[state=active]:text-black"
+                title="Discussions"
+              >
+                <MessageCircle className="h-5 w-5" />
+              </TabsTrigger>
+            </TabsList>
 
-              {/* Tab Content with Instagram-like Grid */}
-              <div className="mt-8">
-                <TabsContent value="vibe" className="mt-0">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                    <DiscoverGrid posts={discoverPosts} />
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="trending" className="mt-0">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                    <DiscoverGrid posts={discoverPosts} />
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="images" className="mt-0">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                    <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "image")} />
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="videos" className="mt-0">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                    <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "video")} />
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="polls" className="mt-0">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                    <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "poll")} />
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="discussions" className="mt-0">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                    <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "discussion")} />
-                  </div>
-                </TabsContent>
-              </div>
-            </Tabs>
-          </div>
+            {/* Tab Content with Instagram-like Grid */}
+            <div className="mt-8">
+              <TabsContent value="vibe" className="mt-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  <DiscoverGrid posts={discoverPosts} />
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="trending" className="mt-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  <DiscoverGrid posts={discoverPosts} />
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="images" className="mt-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "image")} />
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="videos" className="mt-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "video")} />
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="polls" className="mt-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "poll")} />
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="discussions" className="mt-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "discussion")} />
+                </div>
+              </TabsContent>
+            </div>
+          </Tabs>
         </div>
       </div>
     </div>
