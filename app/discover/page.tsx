@@ -136,9 +136,9 @@ export default async function DiscoverPage() {
           <SearchWrapper />
         </div>
 
-        {/* Icon-based Tabs */}
-        <div className="top-[72px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 py-4 border-b border-[#fec400]/20">
-          <Tabs defaultValue="vibe" className="w-full">
+        <Tabs defaultValue="vibe" className="w-full">
+          {/* Tab Selector - Sticky */}
+          <div className="sticky top-[72px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 py-4 border-b border-[#fec400]/20">
             <TabsList className="grid grid-cols-6 w-full max-w-lg mx-auto bg-muted/50 p-1 rounded-full">
               <TabsTrigger 
                 value="vibe" 
@@ -183,47 +183,47 @@ export default async function DiscoverPage() {
                 <MessageCircle className="h-5 w-5" />
               </TabsTrigger>
             </TabsList>
+          </div>
 
-            {/* Tab Content with Instagram-like Grid */}
-            <div className="mt-8">
-              <TabsContent value="vibe" className="mt-0">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                  <DiscoverGrid posts={discoverPosts} />
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="trending" className="mt-0">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                  <DiscoverGrid posts={discoverPosts} />
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="images" className="mt-0">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                  <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "image")} />
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="videos" className="mt-0">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                  <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "video")} />
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="polls" className="mt-0">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                  <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "poll")} />
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="discussions" className="mt-0">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                  <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "discussion")} />
-                </div>
-              </TabsContent>
-            </div>
-          </Tabs>
-        </div>
+          {/* Tab Content - Scrollable */}
+          <div className="mt-8">
+            <TabsContent value="vibe" className="mt-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <DiscoverGrid posts={discoverPosts} />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="trending" className="mt-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <DiscoverGrid posts={discoverPosts} />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="images" className="mt-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "image")} />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="videos" className="mt-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "video")} />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="polls" className="mt-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "poll")} />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="discussions" className="mt-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <DiscoverGrid posts={discoverPosts.filter((post) => post.type === "discussion")} />
+              </div>
+            </TabsContent>
+          </div>
+        </Tabs>
       </div>
     </div>
   )
