@@ -182,7 +182,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     resetPassword,
   }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return React.createElement(
+  AuthContext.Provider,
+  { value },
+  children
+)
+
 }
 
 export function useAuth(): AuthContextType {
