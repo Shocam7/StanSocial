@@ -136,8 +136,8 @@ export default async function DiscoverPage() {
           <SearchWrapper />
         </div>
 
-        {/* Icon-based Tabs - Sticky */}
-        <div className="sticky top-[72px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 py-4 border-b border-[#fec400]/20">
+        {/* Icon-based Tabs */}
+        <div className="top-[72px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 py-4 border-b border-[#fec400]/20">
           <Tabs defaultValue="vibe" className="w-full">
             <TabsList className="grid grid-cols-6 w-full max-w-lg mx-auto bg-muted/50 p-1 rounded-full">
               <TabsTrigger 
