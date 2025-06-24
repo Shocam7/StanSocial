@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Search, X, User, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { createClient } from "@/lib/supabase"
+import { getSupabaseBrowser } from "@/lib/supabase"
 
 interface SearchResult {
   id: string
@@ -32,7 +32,7 @@ export function SearchBar({
   const [isSearching, setIsSearching] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
-  const supabase = createClient()
+  const supabase = getSupabaseBrowser()
 
   // Live search function
   const performSearch = async (query: string) => {
