@@ -1,7 +1,7 @@
 import { getSupabaseServer } from "@/lib/supabase"
 import { Header } from "@/components/header"
 import { DiscoverGrid } from "@/components/discover/discover-grid"
-import { SearchBar } from "@/components/search-bar"
+import { SearchWrapper } from "@/components/search-wrapper"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Sparkles, TrendingUp, Image, Video, BarChart3, MessageCircle } from "lucide-react"
 import { FloatingNavButton } from "@/components/floating-nav-button"
@@ -20,6 +20,17 @@ function getRelativeTimeString(date: Date): string {
 
 export default async function DiscoverPage() {
   const supabase = getSupabaseServer()
+
+  const handleSearchResultSelect = (result: SearchResult) => {
+    // Handle navigation to idol or user profile
+    if (result.type === 'idol') {
+      // Navigate to idol profile
+      window.location.href = `/idol/${result.id}`
+    } else {
+      // Navigate to user profile
+      window.location.href = `/user/${result.username}`
+    }
+  }
 
   // Fetch stanned idols (in a real app, this would be for the current user)
   const { data: stannedIdolsData } = await supabase
@@ -124,7 +135,7 @@ export default async function DiscoverPage() {
         <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 py-6 border-b border-[#fec400]/20">
           <div className="flex flex-col space-y-4">
             {/* Search Bar Component */}
-            <SearchBar />
+            <SearchWrapper />
 
             {/* Icon-based Tabs */}
             <Tabs defaultValue="vibe" className="w-full">
