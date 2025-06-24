@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { getSupabaseBrowser } from '@/lib/supabase'
 import { toast } from 'sonner'
@@ -182,12 +182,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     resetPassword,
   }
 
-  return React.createElement(
-  AuthContext.Provider,
-  { value },
-  children
-)
-
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export function useAuth(): AuthContextType {
