@@ -18,8 +18,13 @@ function getRelativeTimeString(date: Date): string {
   return `${Math.floor(diffInSeconds / 86400)}d`
 }
 
-export default async function DiscoverPage() {
+interface DiscoverPageProps {
+  searchParams: { [key: string]: string | string[] | undefined }
+}
+
+export default async function DiscoverPage({ searchParams }: DiscoverPageProps) {
   const supabase = getSupabaseServer()
+  const selectedIdolId = searchParams.selectedIdol as string | undefined
 
   const handleSearchResultSelect = (result: SearchResult) => {
     // Handle navigation to idol or user profile
@@ -55,8 +60,14 @@ export default async function DiscoverPage() {
 
   const stannedIdols = idols.filter((idol) => idol.isStanned)
 
-  // Fetch ALL posts (trending on platform regardless of stanned status)
-  const { data: postsData } = await supabase.from("posts").select("*").order("trending_score", { ascending: false })
+  // Build posts query - filter by selected idol if provided
+  let postsQuery = supabase.from("posts").select("*")
+  
+  if (selectedIdolId) {
+    postsQuery = postsQuery.eq("idol_id", selectedIdolId)
+  }
+  
+  const { data: postsData } = await postsQuery.order("trending_score", { ascending: false })
 
   // Transform posts data
   const discoverPosts: DiscoverPost[] = await Promise.all(
@@ -125,6 +136,9 @@ export default async function DiscoverPage() {
     }),
   )
 
+  // Get selected idol info for display
+  const selectedIdol = selectedIdolId ? idols.find(idol => idol.id === selectedIdolId) : null
+
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
       <FloatingNavButton />
@@ -134,6 +148,19 @@ export default async function DiscoverPage() {
         {/* Search Bar - Sticky */}
         <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-20 py-4 border-b border-[#fec400]/10">
           <SearchWrapper />
+          {/* Show selected idol filter */}
+          {selectedIdol && (
+            <div className="mt-3 flex items-center gap-2">
+              <div className="flex items-center gap-2 bg-[#fec400]/10 px-3 py-2 rounded-full">
+                <img 
+                  src={selectedIdol.image} 
+                  alt={selectedIdol.name}
+                  className="w-6 h-6 rounded-full object-cover"
+                />
+                <span className="text-sm font-medium">Filtering by {selectedIdol.name}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         <Tabs defaultValue="vibe" className="w-full">
