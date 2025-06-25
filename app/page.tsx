@@ -1,8 +1,6 @@
 "use client"
 
-import { AvatarFallback } from "@/components/ui/avatar"
-import { AvatarImage } from "@/components/ui/avatar"
-import { Avatar } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useState, useEffect } from "react"
 import { Header } from "@/components/header"
 import { Post } from "@/components/post"
