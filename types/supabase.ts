@@ -1,3 +1,4 @@
+// Updated types/supabase.ts
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export interface Database {
@@ -196,6 +197,98 @@ export interface Database {
           },
         ]
       }
+      user_friendships: { // Friendship system (mutual friends)
+        Row: {
+          id: string
+          user_id_1: string
+          user_id_2: string
+          status: string
+          requester_id: string
+          created_at: string
+          accepted_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id_1: string
+          user_id_2: string
+          status?: string
+          requester_id: string
+          created_at?: string
+          accepted_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id_1?: string
+          user_id_2?: string
+          status?: string
+          requester_id?: string
+          created_at?: string
+          accepted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_friendships_user_id_1_fkey"
+            columns: ["user_id_1"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_friendships_user_id_2_fkey"
+            columns: ["user_id_2"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_friendships_requester_id_fkey"
+            columns: ["requester_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_favorites: { // NEW TABLE
+        Row: {
+          id: string
+          user_id: string
+          idol_id: string
+          question: string
+          answer: string
+          category: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          idol_id: string
+          question: string
+          answer: string
+          category?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          idol_id?: string
+          question?: string
+          answer?: string
+          category?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_favorites_idol_id_fkey"
+            columns: ["idol_id"]
+            referencedRelation: "idols"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_stanned_idols: {
         Row: {
           user_id: string
@@ -233,6 +326,9 @@ export interface Database {
           name: string
           username: string
           avatar: string
+          bio: string | null // NEW
+          friends_count: number // NEW
+          posts_count: number // NEW
           created_at: string
         }
         Insert: {
@@ -240,6 +336,9 @@ export interface Database {
           name: string
           username: string
           avatar: string
+          bio?: string | null // NEW
+          friends_count?: number // NEW
+          posts_count?: number // NEW
           created_at?: string
         }
         Update: {
@@ -247,6 +346,9 @@ export interface Database {
           name?: string
           username?: string
           avatar?: string
+          bio?: string | null // NEW
+          friends_count?: number // NEW
+          posts_count?: number // NEW
           created_at?: string
         }
         Relationships: []

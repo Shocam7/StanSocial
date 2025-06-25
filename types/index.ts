@@ -1,3 +1,5 @@
+// Updated types/index.ts
+
 export interface Idol {
   id: string
   name: string
@@ -12,7 +14,39 @@ export interface User {
   name: string
   username: string
   avatar: string
+  bio?: string // NEW
+  friendsCount: number // NEW
+  postsCount: number // NEW
   stannedIdols: string[]
+}
+
+export interface UserFriendship {
+  id: string
+  userId1: string
+  userId2: string
+  status: 'pending' | 'accepted' | 'declined'
+  requesterId: string
+  createdAt: string
+  acceptedAt?: string
+}
+
+export interface Friend {
+  id: string
+  name: string
+  username: string
+  avatar: string
+  friendshipDate: string
+}
+
+export interface UserFavorite {
+  id: string
+  userId: string
+  idolId: string
+  question: string
+  answer: string
+  category?: string
+  createdAt: string
+  idol?: Idol // Populated when needed
 }
 
 export interface Collection {
@@ -71,4 +105,14 @@ export interface DiscoverPost {
     votes: number
   }>
   totalVotes?: number
+}
+
+// Profile page specific types
+export interface ProfileData {
+  user: User
+  posts: Post[]
+  mediaPosts: Post[]
+  collections: Collection[]
+  favorites: UserFavorite[]
+  stannedIdolsCount: number
 }
