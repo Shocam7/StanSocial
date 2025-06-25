@@ -1,27 +1,17 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { ArrowLeft, Edit3, Settings, Camera, Heart, MessageCircle, Repeat2, Share, Grid3X3, Bookmark, Star, Play } from "lucide-react"
+import { ArrowLeft, Edit3, Settings, Camera, Heart, MessageCircle, Repeat2, Share, Grid3X3, Bookmark, Star, Play, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useAuth } from '@/hooks/use-auth'
+import { ProtectedRoute } from '@/components/auth/protected-route'
+import { getSupabaseBrowser } from '@/lib/supabase'
 
-// Mock user data
-const userData = {
-  name: "Alex Chen",
-  username: "@alexchen",
-  bio: "Stan culture enthusiast 🌟 | K-pop lover | Swiftie since 2006 | Spreading positivity through fandoms ✨",
-  avatar: "/placeholder.svg?height=120&width=120&text=AC",
-  stats: {
-    posts: 1247,
-    friends: 89,
-    stanned: 12
-  }
-}
-
-// Mock posts data
+// Mock posts data (you can replace this with actual user posts from your database)
 const mockPosts = [
   {
     id: "1",
@@ -76,11 +66,42 @@ const mockFavorites = [
   { id: "4", idol: "Ariana Grande", question: "Era", answer: "Positions" }
 ]
 
-export default function RedesignedProfilePage() {
+function ProfileContent() {
+  const { user, signOut } = useAuth()
   const [activeTab, setActiveTab] = useState("posts")
   const [isContentExpanded, setIsContentExpanded] = useState(false)
-  const contentRef = useRef<HTMLDivElement>(null)
+  const [userProfile, setUserProfile] = useState(null)
+  const [loadingProfile, setLoadingProfile] = useState(true)
+  const contentRef = useRef(null)
   const [scrollY, setScrollY] = useState(0)
+  const supabase = getSupabaseBrowser()
+
+  // Fetch user profile data
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return
+
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+
+        if (error) {
+          console.error('Error fetching user profile:', error)
+        } else {
+          setUserProfile(data)
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error)
+      } finally {
+        setLoadingProfile(false)
+      }
+    }
+
+    fetchUserProfile()
+  }, [user, supabase])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -98,6 +119,35 @@ export default function RedesignedProfilePage() {
 
   const goBack = () => {
     window.history.back()
+  }
+
+  const handleSignOut = async () => {
+    await signOut()
+  }
+
+  // Show loading state while fetching profile
+  if (loadingProfile) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#fec400]" />
+          <p className="text-muted-foreground">Loading profile...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Use profile data or fallback to user metadata
+  const displayName = userProfile?.name || user?.user_metadata?.name || 'User'
+  const displayUsername = userProfile?.username || user?.user_metadata?.username || user?.email?.split('@')[0]
+  const displayBio = userProfile?.bio || "Welcome to my profile! 🌟"
+  const displayAvatar = userProfile?.avatar || user?.user_metadata?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${displayUsername}`
+
+  // Mock stats (you can replace with actual data from your database)
+  const stats = {
+    posts: userProfile?.posts_count || 0,
+    friends: userProfile?.friends_count || 0,
+    stanned: userProfile?.stanned_count || 0
   }
 
   return (
@@ -126,6 +176,7 @@ export default function RedesignedProfilePage() {
               variant="ghost" 
               size="icon" 
               className="rounded-full hover:bg-muted/50"
+              onClick={handleSignOut}
             >
               <Settings className="h-5 w-5" />
             </Button>
@@ -138,9 +189,9 @@ export default function RedesignedProfilePage() {
         {/* Profile Avatar */}
         <div className="relative mb-6">
           <Avatar className="h-32 w-32 ring-4 ring-[#fec400]/20 shadow-2xl">
-            <AvatarImage src={userData.avatar} alt={userData.name} />
+            <AvatarImage src={displayAvatar} alt={displayName} />
             <AvatarFallback className="text-3xl bg-gradient-to-br from-[#fec400]/20 to-[#fec400]/10 font-bold">
-              AC
+              {displayName.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <Button 
@@ -154,19 +205,19 @@ export default function RedesignedProfilePage() {
 
         {/* Name */}
         <h1 className="text-4xl font-black text-foreground mb-2 tracking-tight">
-          {userData.name}
+          {displayName}
         </h1>
 
         {/* Username */}
         <p className="text-sm font-light text-muted-foreground mb-6">
-          {userData.username}
+          @{displayUsername}
         </p>
 
         {/* Stats */}
         <div className="flex items-center gap-12 mb-8">
           <div className="text-center">
             <div className="text-2xl font-bold text-foreground tracking-tight">
-              {userData.stats.posts.toLocaleString()}
+              {stats.posts.toLocaleString()}
             </div>
             <div className="text-sm text-muted-foreground font-light">
               posts
@@ -174,7 +225,7 @@ export default function RedesignedProfilePage() {
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-foreground tracking-tight">
-              {userData.stats.friends.toLocaleString()}
+              {stats.friends.toLocaleString()}
             </div>
             <div className="text-sm text-muted-foreground font-light">
               friends
@@ -182,7 +233,7 @@ export default function RedesignedProfilePage() {
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-[#fec400] tracking-tight">
-              {userData.stats.stanned}
+              {stats.stanned}
             </div>
             <div className="text-sm text-muted-foreground font-light">
               stanned
@@ -192,8 +243,16 @@ export default function RedesignedProfilePage() {
 
         {/* Bio */}
         <p className="text-center text-foreground/90 leading-relaxed max-w-md px-4 font-normal">
-          {userData.bio}
+          {displayBio}
         </p>
+
+        {/* User Info for Development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-4 p-2 bg-muted/50 rounded-lg text-xs text-muted-foreground">
+            <p>User ID: {user?.id}</p>
+            <p>Email: {user?.email}</p>
+          </div>
+        )}
       </div>
 
       {/* Section 2: Content Gallery (20% preview, expandable) */}
@@ -373,5 +432,13 @@ export default function RedesignedProfilePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AuthenticatedProfilePage() {
+  return (
+    <ProtectedRoute>
+      <ProfileContent />
+    </ProtectedRoute>
   )
 }
