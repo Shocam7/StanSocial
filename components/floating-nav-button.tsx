@@ -114,7 +114,7 @@ export function FloatingNavButton() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-[9999]">
+    <div className="fixed bottom-20 right-4 z-[9999] md:bottom-4">
       {/* Tube Menu */}
       <div
         className={`absolute bottom-16 right-0 w-16 bg-black rounded-full transition-all duration-300 ease-in-out overflow-hidden ${

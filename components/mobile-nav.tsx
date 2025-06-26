@@ -1,12 +1,14 @@
 "use client"
 
-import { Clock, Plus, User, Compass } from "lucide-react"
+import { Clock, Plus, User, Compass, LogIn } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useAuth } from "@/hooks/use-auth"
 
 export function MobileNav() {
   const pathname = usePathname()
+  const { user, isLoading } = useAuth()
 
   const isActive = (path: string) => {
     return pathname === path
@@ -58,17 +60,33 @@ export function MobileNav() {
             <span className="text-xs">Moments</span>
           </Button>
         </Link>
-        <Link href="/me">
-          <Button 
-            variant={isActive("/me") ? "menuicon" : "ghost"} 
-            size="menuicon" 
-            className="flex flex-col items-center gap-1 h-auto py-2 px-3"
-          >
-            <User className="h-5 w-5" />
-            <span className="text-xs">Me</span>
-          </Button>
-        </Link>
+        {/* Conditionally render Me or Login button based on auth status */}
+        {!isLoading && (
+          user ? (
+            <Link href="/me">
+              <Button 
+                variant={isActive("/me") ? "menuicon" : "ghost"} 
+                size="menuicon" 
+                className="flex flex-col items-center gap-1 h-auto py-2 px-3"
+              >
+                <User className="h-5 w-5" />
+                <span className="text-xs">Me</span>
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/login">
+              <Button 
+                variant={isActive("/login") ? "menuicon" : "ghost"} 
+                size="menuicon" 
+                className="flex flex-col items-center gap-1 h-auto py-2 px-3"
+              >
+                <LogIn className="h-5 w-5" />
+                <span className="text-xs">Login</span>
+              </Button>
+            </Link>
+          )
+        )}
       </div>
     </div>
   )
-              }
+}

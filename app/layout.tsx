@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { MobileNav } from "@/components/mobile-nav"
+import { FloatingNavButton } from "@/components/floating-nav-button"
 import { AuthProvider } from "@/hooks/use-auth"
 import { Toaster } from "sonner"
 
@@ -30,7 +31,12 @@ function LayoutContent({ children }: RootLayoutProps) {
       <AuthProvider>
         <div className="relative min-h-screen flex flex-col">
           {children}
-          {showMobileNav && <MobileNav />}
+          {showMobileNav && (
+            <>
+              <MobileNav />
+              <FloatingNavButton />
+            </>
+          )}
         </div>
         <Toaster position="top-right" />
       </AuthProvider>
