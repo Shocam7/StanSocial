@@ -19,7 +19,7 @@ export interface User {
   postsCount: number
   stannedIdols: string[]
   onboardingCompleted?: boolean
-  interests?: string[]
+  categories?: string[]
 }
 
 export interface UserFriendship {

@@ -371,7 +371,7 @@ export interface Database {
           friends_count: number
           posts_count: number
           onboarding_completed: boolean
-          interests: string[] | null
+          categories: string[] | null
         }
         Insert: {
           id?: string
@@ -383,7 +383,7 @@ export interface Database {
           friends_count?: number
           posts_count?: number
           onboarding_completed?: boolean
-          interests?: string[] | null
+          categories?: string[] | null
         }
         Update: {
           id?: string
@@ -395,7 +395,7 @@ export interface Database {
           friends_count?: number
           posts_count?: number
           onboarding_completed?: boolean
-          interests?: string[] | null
+          categories?: string[] | null
         }
         Relationships: []
       }
