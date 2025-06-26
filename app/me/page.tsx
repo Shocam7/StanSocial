@@ -7,10 +7,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useAuth } from '@/hooks/use-auth'
 import { ProtectedRoute } from '@/components/auth/protected-route'
 import { getSupabaseBrowser } from '@/lib/supabase'
+import { FriendsModal } from '@/components/friends-modal'
+import { StannedIdolsModal } from '@/components/stanned-idols-modal'
 
 function ProfileContent() {
   const { user, signOut } = useAuth()
@@ -276,12 +277,12 @@ function ProfileContent() {
         </p>
 
         {/* Stats */}
-        <div className="flex items-center gap-12 mb-8">
+        <div className="flex items-center gap-8 mb-8">
           <div className="text-center">
-            <div className="text-2xl font-bold text-foreground tracking-tight">
+            <div className="text-2xl font-black text-foreground tracking-tighter leading-none">
               {stats.posts.toLocaleString()}
             </div>
-            <div className="text-sm text-muted-foreground font-light">
+            <div className="text-sm text-foreground font-black tracking-tight -mt-1">
               posts
             </div>
           </div>
@@ -289,10 +290,10 @@ function ProfileContent() {
             className="text-center cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => setShowFriendsModal(true)}
           >
-            <div className="text-2xl font-bold text-foreground tracking-tight">
+            <div className="text-2xl font-black text-foreground tracking-tighter leading-none">
               {stats.friends.toLocaleString()}
             </div>
-            <div className="text-sm text-muted-foreground font-light underline">
+            <div className="text-sm text-foreground font-black tracking-tight -mt-1">
               friends
             </div>
           </div>
@@ -300,10 +301,10 @@ function ProfileContent() {
             className="text-center cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => setShowStannedModal(true)}
           >
-            <div className="text-2xl font-bold text-[#fec400] tracking-tight">
+            <div className="text-2xl font-black text-[#fec400] tracking-tighter leading-none">
               {stats.stanned}
             </div>
-            <div className="text-sm text-muted-foreground font-light underline">
+            <div className="text-sm text-foreground font-black tracking-tight -mt-1">
               stanned
             </div>
           </div>
@@ -582,97 +583,18 @@ function ProfileContent() {
         </div>
       </div>
 
-      {/* Friends Modal */}
-      <Dialog open={showFriendsModal} onOpenChange={setShowFriendsModal}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              Friends
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowFriendsModal(false)}
-                className="h-6 w-6"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </DialogTitle>
-          </DialogHeader>
-          <div className="max-h-96 overflow-y-auto">
-            {friends.length > 0 ? (
-              <div className="space-y-3">
-                {friends.map((friendship) => (
-                  <div key={friendship.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={friendship.friend.avatar} alt={friendship.friend.name} />
-                      <AvatarFallback>{friendship.friend.name?.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm">{friendship.friend.name}</p>
-                      <p className="text-xs text-muted-foreground">@{friendship.friend.username}</p>
-                    </div>
-                    <Badge variant="secondary" className="text-xs">
-                      {friendship.mutual_friends_count || 0} mutual
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Users className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
-                <p className="text-muted-foreground">No friends yet</p>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Use the separate modal components */}
+      <FriendsModal 
+        open={showFriendsModal}
+        onOpenChange={setShowFriendsModal}
+        friends={friends}
+      />
 
-      {/* Stanned Idols Modal */}
-      <Dialog open={showStannedModal} onOpenChange={setShowStannedModal}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              Stanned Idols
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowStannedModal(false)}
-                className="h-6 w-6"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </DialogTitle>
-          </DialogHeader>
-          <div className="max-h-96 overflow-y-auto">
-            {stannedIdols.length > 0 ? (
-              <div className="space-y-3">
-                {stannedIdols.map((stan) => (
-                  <div key={stan.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={stan.idol.image} alt={stan.idol.name} />
-                      <AvatarFallback>{stan.idol.name?.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm">{stan.idol.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Stanned {new Date(stan.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <Star className="h-4 w-4 text-[#fec400] mx-auto" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Star className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
-                <p className="text-muted-foreground">No stanned idols yet</p>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <StannedIdolsModal 
+        open={showStannedModal}
+        onOpenChange={setShowStannedModal}
+        stannedIdols={stannedIdols}
+      />
     </div>
   )
 }
