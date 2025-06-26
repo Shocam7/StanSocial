@@ -17,8 +17,62 @@ export default function OnboardingPage() {
   useEffect(() => {
     if (!user) {
       router.push('/auth')
+      return
     }
+
+    // Check if user has already completed onboarding
+    checkOnboardingStatus()
   }, [user, router])
+
+  const checkOnboardingStatus = async () => {
+    if (!user) return
+
+    const supabase = getSupabaseBrowser()
+    
+    try {
+      // Check if user has completed onboarding
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('onboarding_completed')
+        .eq('id', user.id)
+        .single()
+
+      if (userError) {
+        console.error('Error checking user onboarding status:', userError)
+        return
+      }
+
+      // If onboarding is already completed, redirect to homepage
+      if (userData?.onboarding_completed) {
+        router.push('/')
+        return
+      }
+
+      // Alternative check: if user has stanned idols, consider onboarding complete
+      const { data: stanData, error: stanError } = await supabase
+        .from('user_stanned_idols')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1)
+
+      if (stanError) {
+        console.error('Error checking stan data:', stanError)
+        return
+      }
+
+      if (stanData?.length > 0) {
+        // Mark onboarding as complete and redirect
+        await supabase
+          .from('users')
+          .update({ onboarding_completed: true })
+          .eq('id', user.id)
+        
+        router.push('/')
+      }
+    } catch (error) {
+      console.error('Error checking onboarding status:', error)
+    }
+  }
 
   const handleCompleteOnboarding = async (data: {
     interests: string[]
@@ -58,23 +112,22 @@ export default function OnboardingPage() {
         await Promise.all(friendPromises)
       }
 
-      // 3. Update user interests/preferences (you might want to add this to your schema)
-      // For now, we'll store it in a JSON field or create a user_interests table
+      // 3. Update user interests/preferences
+      // You'll need to add these fields to your users table or create a separate table
       if (data.interests.length > 0) {
         await supabase
           .from('users')
           .update({
-            // You might want to add an interests field to users table
-            // interests: data.interests
+            interests: data.interests // Make sure this field exists in your users table
           })
           .eq('id', user.id)
       }
 
-      // 4. Mark onboarding as complete (add onboarding_completed field to users table)
+      // 4. Mark onboarding as complete
       await supabase
         .from('users')
         .update({
-          // onboarding_completed: true
+          onboarding_completed: true
         })
         .eq('id', user.id)
 
@@ -100,4 +153,4 @@ export default function OnboardingPage() {
       loading={loading}
     />
   )
-    }
+}

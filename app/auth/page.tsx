@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { Eye, EyeOff, Loader2, Sparkles, ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { getSupabaseBrowser } from '@/lib/supabase'
 
 export default function AuthPage() {
   const { signIn, signUp, resetPassword, user } = useAuth()
@@ -41,9 +42,49 @@ export default function AuthPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
-      router.push('/')
+      checkOnboardingStatus()
     }
   }, [user, router])
+
+  // Check if user has completed onboarding
+  const checkOnboardingStatus = async () => {
+    if (!user) return
+
+    const supabase = getSupabaseBrowser()
+    
+    try {
+      // Check if user has completed onboarding
+      // Option 1: Check for onboarding_completed field
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('onboarding_completed')
+        .eq('id', user.id)
+        .single()
+
+      if (userError) throw userError
+
+      // Option 2: If no dedicated field, check if user has any stanned idols
+      // (indicating they've completed onboarding)
+      const { data: stanData, error: stanError } = await supabase
+        .from('user_stanned_idols')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1)
+
+      if (stanError) throw stanError
+
+      // Redirect based on onboarding status
+      if (userData?.onboarding_completed || stanData?.length > 0) {
+        router.push('/')
+      } else {
+        router.push('/onboarding')
+      }
+    } catch (error) {
+      console.error('Error checking onboarding status:', error)
+      // Default to homepage if there's an error
+      router.push('/')
+    }
+  }
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,7 +93,8 @@ export default function AuthPage() {
     const success = await signIn(signInForm.email, signInForm.password)
     
     if (success) {
-      router.push('/')
+      // Don't redirect here - let the useEffect handle it after user state updates
+      // The checkOnboardingStatus will be called automatically
     }
     
     setLoading(false)
@@ -79,7 +121,9 @@ export default function AuthPage() {
     )
     
     if (success) {
-      router.push('/')
+      // For new users, always redirect to onboarding
+      // We don't need to check onboarding status for new signups
+      router.push('/onboarding')
     }
     
     setLoading(false)
@@ -99,7 +143,7 @@ export default function AuthPage() {
   }
 
   if (user) {
-    return null // Will redirect
+    return null // Will redirect based on onboarding status
   }
 
   return (
@@ -426,4 +470,4 @@ export default function AuthPage() {
       </div>
     </div>
   )
-         }
+}
