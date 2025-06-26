@@ -80,3 +80,5 @@ function getRelativeTimeString(date: Date): string {
   if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`
   return `${Math.floor(diffInSeconds / 86400)}d`
 }
+
+export { mapDatabasePostToAppPost }

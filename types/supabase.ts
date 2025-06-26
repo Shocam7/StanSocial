@@ -75,30 +75,67 @@ export interface Database {
           }
         ]
       }
+      comments: {
+        Row: {
+          id: string
+          content: string
+          post_id: string
+          user_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          content: string
+          post_id: string
+          user_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          content?: string
+          post_id?: string
+          user_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       idols: {
         Row: {
           id: string
           name: string
           image: string
           category: string
-          created_at: string
           stans: number
+          created_at: string
         }
         Insert: {
           id?: string
           name: string
           image: string
           category: string
-          created_at?: string
           stans?: number
+          created_at?: string
         }
         Update: {
           id?: string
           name?: string
           image?: string
           category?: string
-          created_at?: string
           stans?: number
+          created_at?: string
         }
         Relationships: []
       }
@@ -163,7 +200,7 @@ export interface Database {
             columns: ["user_id"]
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       poll_options: {
@@ -194,10 +231,10 @@ export interface Database {
             columns: ["post_id"]
             referencedRelation: "posts"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
-      user_friendships: { // Friendship system (mutual friends)
+      user_friendships: {
         Row: {
           id: string
           user_id_1: string
@@ -243,10 +280,10 @@ export interface Database {
             columns: ["requester_id"]
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
-      user_favorites: { // NEW TABLE
+      user_favorites: {
         Row: {
           id: string
           user_id: string
@@ -286,24 +323,27 @@ export interface Database {
             columns: ["idol_id"]
             referencedRelation: "idols"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       user_stanned_idols: {
         Row: {
+          id: string
           user_id: string
           idol_id: string
-          created_at: string
+          stanned_at: string
         }
         Insert: {
+          id?: string
           user_id: string
           idol_id: string
-          created_at?: string
+          stanned_at?: string
         }
         Update: {
+          id?: string
           user_id?: string
           idol_id?: string
-          created_at?: string
+          stanned_at?: string
         }
         Relationships: [
           {
@@ -317,7 +357,7 @@ export interface Database {
             columns: ["user_id"]
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       users: {
@@ -326,30 +366,36 @@ export interface Database {
           name: string
           username: string
           avatar: string
-          bio: string | null // NEW
-          friends_count: number // NEW
-          posts_count: number // NEW
           created_at: string
+          bio: string | null
+          friends_count: number
+          posts_count: number
+          onboarding_completed: boolean
+          interests: string[] | null
         }
         Insert: {
           id?: string
           name: string
           username: string
           avatar: string
-          bio?: string | null // NEW
-          friends_count?: number // NEW
-          posts_count?: number // NEW
           created_at?: string
+          bio?: string | null
+          friends_count?: number
+          posts_count?: number
+          onboarding_completed?: boolean
+          interests?: string[] | null
         }
         Update: {
           id?: string
           name?: string
           username?: string
           avatar?: string
-          bio?: string | null // NEW
-          friends_count?: number // NEW
-          posts_count?: number // NEW
           created_at?: string
+          bio?: string | null
+          friends_count?: number
+          posts_count?: number
+          onboarding_completed?: boolean
+          interests?: string[] | null
         }
         Relationships: []
       }

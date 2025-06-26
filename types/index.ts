@@ -14,10 +14,12 @@ export interface User {
   name: string
   username: string
   avatar: string
-  bio?: string // NEW
-  friendsCount: number // NEW
-  postsCount: number // NEW
+  bio?: string
+  friendsCount: number
+  postsCount: number
   stannedIdols: string[]
+  onboardingCompleted?: boolean
+  interests?: string[]
 }
 
 export interface UserFriendship {
@@ -58,6 +60,19 @@ export interface Collection {
   userId: string
   createdAt: string
   updatedAt: string
+}
+
+export interface Comment {
+  id: string
+  content: string
+  postId: string
+  userId: string
+  createdAt: string
+  user?: {
+    name: string
+    username: string
+    avatar: string
+  }
 }
 
 export interface Post {
