@@ -69,7 +69,7 @@ function LayoutContent({ children }: RootLayoutProps) {
   const pathname = usePathname()
   
   // Hide mobile nav on specific pages
-  const hideNavRoutes = ['/me', '/auth']
+  const hideNavRoutes = ['/me', '/auth', '/onboarding']
   const showMobileNav = !hideNavRoutes.includes(pathname)
 
   return (

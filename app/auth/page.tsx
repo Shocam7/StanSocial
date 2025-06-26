@@ -158,11 +158,11 @@ export default function AuthPage() {
           {/* Auth Card */}
           <Card className="border-border/50 shadow-lg">
             <CardHeader className="text-center space-y-4">
-              <div className="mx-auto w-20 h-20 bg-[#fec400] rounded-2xl flex items-center justify-center mb-4">
-                <span className="text-3xl font-black text-black">
+              
+                <span className="mx-auto w-20 h-20 justify-center mb-4 text-3xl font-black text-black">
                   Stan
                 </span>
-              </div>
+              
               
               {mode === 'signin' && (
                 <>
