@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from '@/hooks/use-auth'
-import { Eye, EyeOff, Loader2, Sparkles, ArrowLeft } from 'lucide-react'
+import { Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getSupabaseBrowser } from '@/lib/supabase'
@@ -54,7 +54,6 @@ export default function AuthPage() {
     
     try {
       // Check if user has completed onboarding
-      // Option 1: Check for onboarding_completed field
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('onboarding_completed')
@@ -63,8 +62,7 @@ export default function AuthPage() {
 
       if (userError) throw userError
 
-      // Option 2: If no dedicated field, check if user has any stanned idols
-      // (indicating they've completed onboarding)
+      // Check if user has any stanned idols
       const { data: stanData, error: stanError } = await supabase
         .from('user_stanned_idols')
         .select('id')
@@ -81,7 +79,6 @@ export default function AuthPage() {
       }
     } catch (error) {
       console.error('Error checking onboarding status:', error)
-      // Default to homepage if there's an error
       router.push('/')
     }
   }
@@ -93,7 +90,6 @@ export default function AuthPage() {
     const success = await signIn(signInForm.email, signInForm.password)
     
     if (success) {
-      // Don't redirect here - let the useEffect handle it after user state updates
       // The checkOnboardingStatus will be called automatically
     }
     
@@ -121,8 +117,6 @@ export default function AuthPage() {
     )
     
     if (success) {
-      // For new users, always redirect to onboarding
-      // We don't need to check onboarding status for new signups
       router.push('/onboarding')
     }
     
@@ -147,40 +141,14 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-        {/* Floating Sparkles */}
-        <div className="absolute inset-0">
-          {[...Array(50)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute animate-pulse"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${2 + Math.random() * 3}s`
-              }}
-            >
-              <Sparkles className="w-4 h-4 text-white/20" />
-            </div>
-          ))}
-        </div>
-        
-        {/* Gradient Orbs */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-pink-500/30 to-violet-500/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-cyan-500/30 to-blue-500/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-      </div>
-
+    <div className="min-h-screen bg-background">
       {/* Content */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
+      <div className="flex items-center justify-center min-h-screen p-4">
         <div className="w-full max-w-md">
           {/* Back Button */}
           <div className="mb-6">
             <Link href="/">
-              <Button variant="ghost" className="text-white/80 hover:text-white hover:bg-white/10 rounded-full">
+              <Button variant="ghost" className="text-foreground/60 hover:text-foreground hover:bg-muted">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Home
               </Button>
@@ -188,18 +156,20 @@ export default function AuthPage() {
           </div>
 
           {/* Auth Card */}
-          <Card className="backdrop-blur-xl bg-white/10 border-white/20 shadow-2xl">
-            <CardHeader className="text-center space-y-2">
-              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-pink-500 to-violet-500 rounded-full flex items-center justify-center mb-4">
-                <Sparkles className="w-8 h-8 text-white" />
+          <Card className="border-border/50 shadow-lg">
+            <CardHeader className="text-center space-y-4">
+              <div className="mx-auto w-20 h-20 bg-[#fec400] rounded-2xl flex items-center justify-center mb-4">
+                <span className="text-3xl font-black text-black">
+                  Stan
+                </span>
               </div>
               
               {mode === 'signin' && (
                 <>
-                  <CardTitle className="text-3xl font-bold text-white bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent">
+                  <CardTitle className="text-3xl font-bold text-foreground">
                     Welcome Back
                   </CardTitle>
-                  <CardDescription className="text-white/70 text-lg">
+                  <CardDescription className="text-muted-foreground text-lg">
                     Sign in to continue your journey
                   </CardDescription>
                 </>
@@ -207,10 +177,10 @@ export default function AuthPage() {
               
               {mode === 'signup' && (
                 <>
-                  <CardTitle className="text-3xl font-bold text-white bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                    Join Us
+                  <CardTitle className="text-3xl font-bold text-foreground">
+                    Join Stan
                   </CardTitle>
-                  <CardDescription className="text-white/70 text-lg">
+                  <CardDescription className="text-muted-foreground text-lg">
                     Create your account and get started
                   </CardDescription>
                 </>
@@ -218,10 +188,10 @@ export default function AuthPage() {
               
               {mode === 'reset' && (
                 <>
-                  <CardTitle className="text-3xl font-bold text-white bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                  <CardTitle className="text-3xl font-bold text-foreground">
                     Reset Password
                   </CardTitle>
-                  <CardDescription className="text-white/70 text-lg">
+                  <CardDescription className="text-muted-foreground text-lg">
                     We'll send you a reset link
                   </CardDescription>
                 </>
@@ -233,7 +203,7 @@ export default function AuthPage() {
               {mode === 'signin' && (
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signin-email" className="text-white/90 font-medium">Email</Label>
+                    <Label htmlFor="signin-email" className="text-foreground font-medium">Email</Label>
                     <Input
                       id="signin-email"
                       type="email"
@@ -241,12 +211,12 @@ export default function AuthPage() {
                       value={signInForm.email}
                       onChange={(e) => setSignInForm(prev => ({ ...prev, email: e.target.value }))}
                       required
-                      className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-2xl h-12 focus:bg-white/20 focus:border-white/40 transition-all duration-300"
+                      className="h-12 rounded-xl border-border/50 focus:border-[#fec400] focus:ring-[#fec400]/20"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="signin-password" className="text-white/90 font-medium">Password</Label>
+                    <Label htmlFor="signin-password" className="text-foreground font-medium">Password</Label>
                     <div className="relative">
                       <Input
                         id="signin-password"
@@ -255,13 +225,13 @@ export default function AuthPage() {
                         value={signInForm.password}
                         onChange={(e) => setSignInForm(prev => ({ ...prev, password: e.target.value }))}
                         required
-                        className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-2xl h-12 pr-12 focus:bg-white/20 focus:border-white/40 transition-all duration-300"
+                        className="h-12 rounded-xl pr-12 border-border/50 focus:border-[#fec400] focus:ring-[#fec400]/20"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-white/70 hover:text-white"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -272,7 +242,7 @@ export default function AuthPage() {
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full h-12 bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                    className="w-full h-12 bg-[#fec400] hover:bg-[#fec400]/90 text-black font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Sign In
@@ -283,18 +253,18 @@ export default function AuthPage() {
                       type="button"
                       variant="link"
                       onClick={() => setMode('reset')}
-                      className="text-white/70 hover:text-white underline-offset-4"
+                      className="text-muted-foreground hover:text-foreground"
                     >
                       Forgot your password?
                     </Button>
                     
-                    <div className="text-white/70">
+                    <div className="text-muted-foreground">
                       Don't have an account?{' '}
                       <Button
                         type="button"
                         variant="link"
                         onClick={() => setMode('signup')}
-                        className="text-cyan-400 hover:text-cyan-300 underline-offset-4 p-0 h-auto font-semibold"
+                        className="text-[#fec400] hover:text-[#fec400]/80 p-0 h-auto font-semibold"
                       >
                         Sign up
                       </Button>
@@ -308,7 +278,7 @@ export default function AuthPage() {
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="signup-name" className="text-white/90 font-medium">Full Name</Label>
+                      <Label htmlFor="signup-name" className="text-foreground font-medium">Full Name</Label>
                       <Input
                         id="signup-name"
                         type="text"
@@ -316,12 +286,12 @@ export default function AuthPage() {
                         value={signUpForm.name}
                         onChange={(e) => setSignUpForm(prev => ({ ...prev, name: e.target.value }))}
                         required
-                        className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-2xl h-12 focus:bg-white/20 focus:border-white/40 transition-all duration-300"
+                        className="h-12 rounded-xl border-border/50 focus:border-[#fec400] focus:ring-[#fec400]/20"
                       />
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="signup-username" className="text-white/90 font-medium">Username</Label>
+                      <Label htmlFor="signup-username" className="text-foreground font-medium">Username</Label>
                       <Input
                         id="signup-username"
                         type="text"
@@ -329,13 +299,13 @@ export default function AuthPage() {
                         value={signUpForm.username}
                         onChange={(e) => setSignUpForm(prev => ({ ...prev, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') }))}
                         required
-                        className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-2xl h-12 focus:bg-white/20 focus:border-white/40 transition-all duration-300"
+                        className="h-12 rounded-xl border-border/50 focus:border-[#fec400] focus:ring-[#fec400]/20"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email" className="text-white/90 font-medium">Email</Label>
+                    <Label htmlFor="signup-email" className="text-foreground font-medium">Email</Label>
                     <Input
                       id="signup-email"
                       type="email"
@@ -343,12 +313,12 @@ export default function AuthPage() {
                       value={signUpForm.email}
                       onChange={(e) => setSignUpForm(prev => ({ ...prev, email: e.target.value }))}
                       required
-                      className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-2xl h-12 focus:bg-white/20 focus:border-white/40 transition-all duration-300"
+                      className="h-12 rounded-xl border-border/50 focus:border-[#fec400] focus:ring-[#fec400]/20"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password" className="text-white/90 font-medium">Password</Label>
+                    <Label htmlFor="signup-password" className="text-foreground font-medium">Password</Label>
                     <div className="relative">
                       <Input
                         id="signup-password"
@@ -358,25 +328,25 @@ export default function AuthPage() {
                         onChange={(e) => setSignUpForm(prev => ({ ...prev, password: e.target.value }))}
                         required
                         minLength={6}
-                        className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-2xl h-12 pr-12 focus:bg-white/20 focus:border-white/40 transition-all duration-300"
+                        className="h-12 rounded-xl pr-12 border-border/50 focus:border-[#fec400] focus:ring-[#fec400]/20"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-white/70 hover:text-white"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
                     </div>
                     {signUpForm.password && signUpForm.password.length < 6 && (
-                      <p className="text-sm text-red-400">Password must be at least 6 characters</p>
+                      <p className="text-sm text-destructive">Password must be at least 6 characters</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="signup-confirm-password" className="text-white/90 font-medium">Confirm Password</Label>
+                    <Label htmlFor="signup-confirm-password" className="text-foreground font-medium">Confirm Password</Label>
                     <div className="relative">
                       <Input
                         id="signup-confirm-password"
@@ -385,40 +355,40 @@ export default function AuthPage() {
                         value={signUpForm.confirmPassword}
                         onChange={(e) => setSignUpForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
                         required
-                        className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-2xl h-12 pr-12 focus:bg-white/20 focus:border-white/40 transition-all duration-300"
+                        className="h-12 rounded-xl pr-12 border-border/50 focus:border-[#fec400] focus:ring-[#fec400]/20"
                       />
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-white/70 hover:text-white"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground hover:text-foreground"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       >
                         {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
                     </div>
                     {signUpForm.confirmPassword && signUpForm.password !== signUpForm.confirmPassword && (
-                      <p className="text-sm text-red-400">Passwords do not match</p>
+                      <p className="text-sm text-destructive">Passwords do not match</p>
                     )}
                   </div>
 
                   <Button
                     type="submit"
                     disabled={loading || signUpForm.password !== signUpForm.confirmPassword || signUpForm.password.length < 6}
-                    className="w-full h-12 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                    className="w-full h-12 bg-[#fec400] hover:bg-[#fec400]/90 text-black font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Create Account
                   </Button>
 
                   <div className="text-center">
-                    <div className="text-white/70">
+                    <div className="text-muted-foreground">
                       Already have an account?{' '}
                       <Button
                         type="button"
                         variant="link"
                         onClick={() => setMode('signin')}
-                        className="text-pink-400 hover:text-pink-300 underline-offset-4 p-0 h-auto font-semibold"
+                        className="text-[#fec400] hover:text-[#fec400]/80 p-0 h-auto font-semibold"
                       >
                         Sign in
                       </Button>
@@ -431,7 +401,7 @@ export default function AuthPage() {
               {mode === 'reset' && (
                 <form onSubmit={handleResetPassword} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="reset-email" className="text-white/90 font-medium">Email</Label>
+                    <Label htmlFor="reset-email" className="text-foreground font-medium">Email</Label>
                     <Input
                       id="reset-email"
                       type="email"
@@ -439,14 +409,14 @@ export default function AuthPage() {
                       value={resetForm.email}
                       onChange={(e) => setResetForm(prev => ({ ...prev, email: e.target.value }))}
                       required
-                      className="bg-white/10 border-white/20 text-white placeholder-white/50 rounded-2xl h-12 focus:bg-white/20 focus:border-white/40 transition-all duration-300"
+                      className="h-12 rounded-xl border-border/50 focus:border-[#fec400] focus:ring-[#fec400]/20"
                     />
                   </div>
 
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full h-12 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                    className="w-full h-12 bg-[#fec400] hover:bg-[#fec400]/90 text-black font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Send Reset Link
@@ -457,7 +427,7 @@ export default function AuthPage() {
                       type="button"
                       variant="link"
                       onClick={() => setMode('signin')}
-                      className="text-white/70 hover:text-white underline-offset-4"
+                      className="text-muted-foreground hover:text-foreground"
                     >
                       Back to Sign In
                     </Button>
