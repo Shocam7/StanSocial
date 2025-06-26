@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 
 interface OnboardingFlowProps {
   onComplete: (data: {
-    interests: string[]
+    categories: string[]
     idols: string[]
     friends: string[]
   }) => void
@@ -167,7 +167,7 @@ export default function OnboardingFlow({ onComplete, loading }: OnboardingFlowPr
 
   const handleComplete = () => {
     onComplete({
-      interests: [selectedCategory],
+      categories: [selectedCategory],
       idols: selectedIdols,
       friends: selectedFriends
     })

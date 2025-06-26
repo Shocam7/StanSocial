@@ -75,7 +75,7 @@ export default function OnboardingPage() {
   }
 
   const handleCompleteOnboarding = async (data: {
-    interests: string[]
+    categories: string[]
     idols: string[]
     friends: string[]
   }) => {
@@ -112,13 +112,13 @@ export default function OnboardingPage() {
         await Promise.all(friendPromises)
       }
 
-      // 3. Update user interests/preferences
+      // 3. Update user categories/preferences
       // You'll need to add these fields to your users table or create a separate table
-      if (data.interests.length > 0) {
+      if (data.categories.length > 0) {
         await supabase
           .from('users')
           .update({
-            interests: data.interests // Make sure this field exists in your users table
+            categories: data.categories // Make sure this field exists in your users table
           })
           .eq('id', user.id)
       }
