@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { getSupabaseBrowser } from '@/lib/supabase'
-import { Heart, Users, Sparkles, ArrowRight, ArrowLeft, Check } from 'lucide-react'
+import { Heart, Users, Sparkles, ArrowRight, ArrowLeft, Check, Compass, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface OnboardingFlowProps {
@@ -184,83 +184,73 @@ export default function OnboardingFlow({ onComplete, loading }: OnboardingFlowPr
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-        <div className="absolute inset-0">
-          {[...Array(30)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute animate-pulse"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${2 + Math.random() * 3}s`
-              }}
-            >
-              <Sparkles className="w-3 h-3 text-white/10" />
-            </div>
-          ))}
+    <div className="min-h-screen bg-background relative">
+      {/* Navigation-style header */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-[#fec400]/40">
+        <div className="flex items-center justify-between px-4 py-4">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-black tracking-tight">Stan</span>
+            <span className="text-sm text-muted-foreground">Setup</span>
+          </div>
+          
+          {/* Progress indicators matching mobile nav style */}
+          <div className="flex items-center gap-2">
+            {[1, 2, 3].map((stepNum) => (
+              <div
+                key={stepNum}
+                className={cn(
+                  "w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-300",
+                  step >= stepNum 
+                    ? "bg-[#fec400] text-black" 
+                    : "bg-muted text-muted-foreground"
+                )}
+              >
+                {step > stepNum ? <Check className="w-4 h-4" /> : stepNum}
+              </div>
+            ))}
+          </div>
         </div>
-        
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-pink-500/20 to-violet-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <div className="w-full max-w-4xl">
-          {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex items-center justify-center space-x-4 mb-4">
-              {[1, 2, 3].map((stepNum) => (
-                <div key={stepNum} className="flex items-center">
-                  <div className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300",
-                    step >= stepNum 
-                      ? "bg-gradient-to-r from-pink-500 to-violet-500 text-white" 
-                      : "bg-white/20 text-white/60"
-                  )}>
-                    {step > stepNum ? <Check className="w-5 h-5" /> : stepNum}
-                  </div>
-                  {stepNum < 3 && (
-                    <div className={cn(
-                      "w-16 h-1 mx-2 transition-all duration-300",
-                      step > stepNum ? "bg-gradient-to-r from-pink-500 to-violet-500" : "bg-white/20"
-                    )} />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
+      {/* Content with proper padding for fixed header */}
+      <div className="pt-20 pb-24 px-4 min-h-screen">
+        <div className="max-w-4xl mx-auto">
+          
           {/* Step 1: Welcome & Categories */}
           {step === 1 && (
-            <div className="text-center space-y-8">
+            <div className="space-y-8">
               {/* Animated Welcome Text */}
-              <div className="h-24 flex items-center justify-center">
-                <div className={cn(
-                  "transition-all duration-500 transform",
-                  showWelcomeText ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
-                )}>
-                  {showWelcomeText && (
-                    <h1 className="text-5xl font-bold bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent">
-                      Welcome, Stan
-                    </h1>
-                  )}
+              <div className="text-center space-y-4">
+                <div className="h-16 flex items-center justify-center">
+                  <div className={cn(
+                    "transition-all duration-500 transform",
+                    showWelcomeText ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
+                  )}>
+                    {showWelcomeText && (
+                      <h1 className="text-4xl md:text-5xl font-black tracking-tight">
+                        Welcome to <span className="text-[#fec400]">Stan</span>
+                      </h1>
+                    )}
+                  </div>
+                  
+                  <div className={cn(
+                    "transition-all duration-500 transform absolute",
+                    showSecondText ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                  )}>
+                    {showSecondText && (
+                      <h1 className="text-4xl md:text-5xl font-black tracking-tight">
+                        What interests you?
+                      </h1>
+                    )}
+                  </div>
                 </div>
                 
-                <div className={cn(
-                  "transition-all duration-500 transform absolute",
-                  showSecondText ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                <p className={cn(
+                  "text-muted-foreground text-lg transition-all duration-700",
+                  showSecondText ? "opacity-100" : "opacity-0"
                 )}>
-                  {showSecondText && (
-                    <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                      What do you love?
-                    </h1>
-                  )}
-                </div>
+                  Choose a category to get started
+                </p>
               </div>
 
               {/* Categories Grid */}
@@ -268,24 +258,27 @@ export default function OnboardingFlow({ onComplete, loading }: OnboardingFlowPr
                 "transition-all duration-700 transform",
                 showSecondText ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               )}>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {categories.map((category, index) => (
                     <Card 
                       key={category}
                       className={cn(
-                        "backdrop-blur-xl bg-white/10 border-white/20 hover:bg-white/20 cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-xl",
+                        "cursor-pointer transition-all duration-300 hover:shadow-lg border-border/50 hover:border-[#fec400]/40",
                         "animate-fade-in-up"
                       )}
                       style={{ animationDelay: `${index * 100}ms` }}
                       onClick={() => handleCategorySelect(category)}
                     >
-                      <CardContent className="p-6 text-center">
-                        <div className="mb-3">
-                          <Heart className="w-8 h-8 mx-auto text-pink-400" />
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-full bg-[#fec400]/10 flex items-center justify-center">
+                            <Compass className="w-6 h-6 text-[#fec400]" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-lg">{category}</h3>
+                            <p className="text-sm text-muted-foreground">Explore {category.toLowerCase()}</p>
+                          </div>
                         </div>
-                        <h3 className="text-white font-semibold text-lg">
-                          {category}
-                        </h3>
                       </CardContent>
                     </Card>
                   ))}
@@ -297,71 +290,53 @@ export default function OnboardingFlow({ onComplete, loading }: OnboardingFlowPr
           {/* Step 2: Select Idols */}
           {step === 2 && (
             <div className="space-y-8">
-              <div className="text-center">
-                <h1 className="text-5xl font-bold bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent mb-4">
-                  Who do you love?
+              <div className="text-center space-y-4">
+                <h1 className="text-4xl md:text-5xl font-black tracking-tight">
+                  Choose your <span className="text-[#fec400]">favorites</span>
                 </h1>
-                <p className="text-white/70 text-lg">
-                  Select your favorite {selectedCategory.toLowerCase()} idols
+                <p className="text-muted-foreground text-lg">
+                  Select {selectedCategory.toLowerCase()} idols you want to follow
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {idols.map((idol, index) => (
                   <Card 
                     key={idol.id}
                     className={cn(
-                      "backdrop-blur-xl border-white/20 cursor-pointer transition-all duration-300 transform hover:scale-105",
+                      "cursor-pointer transition-all duration-300 hover:shadow-lg",
                       selectedIdols.includes(idol.id) 
-                        ? "bg-gradient-to-r from-pink-500/30 to-violet-500/30 border-pink-400/50" 
-                        : "bg-white/10 hover:bg-white/20",
+                        ? "border-[#fec400] bg-[#fec400]/5" 
+                        : "border-border/50 hover:border-[#fec400]/40",
                       "animate-fade-in-up"
                     )}
                     style={{ animationDelay: `${index * 50}ms` }}
                     onClick={() => handleIdolToggle(idol.id)}
                   >
-                    <CardContent className="p-4 text-center">
-                      <div className="relative mb-3">
-                        <img 
-                          src={idol.image} 
-                          alt={idol.name}
-                          className="w-20 h-20 rounded-full mx-auto object-cover"
-                        />
-                        {selectedIdols.includes(idol.id) && (
-                          <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-pink-500 to-violet-500 rounded-full flex items-center justify-center">
-                            <Check className="w-3 h-3 text-white" />
-                          </div>
-                        )}
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        <div className="relative">
+                          <img 
+                            src={idol.image} 
+                            alt={idol.name}
+                            className="w-full aspect-square rounded-lg object-cover"
+                          />
+                          {selectedIdols.includes(idol.id) && (
+                            <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#fec400] rounded-full flex items-center justify-center">
+                              <Check className="w-3 h-3 text-black" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-center">
+                          <h3 className="font-semibold text-sm truncate">{idol.name}</h3>
+                          <p className="text-xs text-muted-foreground">
+                            {idol.stans.toLocaleString()} stans
+                          </p>
+                        </div>
                       </div>
-                      <h3 className="text-white font-semibold text-sm mb-1">
-                        {idol.name}
-                      </h3>
-                      <p className="text-white/60 text-xs">
-                        {idol.stans.toLocaleString()} stans
-                      </p>
                     </CardContent>
                   </Card>
                 ))}
-              </div>
-
-              <div className="flex justify-between items-center">
-                <Button 
-                  onClick={handleBack}
-                  variant="ghost"
-                  className="text-white/70 hover:text-white hover:bg-white/10"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back
-                </Button>
-                
-                <Button 
-                  onClick={handleNext}
-                  disabled={selectedIdols.length === 0}
-                  className="bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 text-white px-8"
-                >
-                  Next
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
               </div>
             </div>
           )}
@@ -369,82 +344,129 @@ export default function OnboardingFlow({ onComplete, loading }: OnboardingFlowPr
           {/* Step 3: Find Friends */}
           {step === 3 && (
             <div className="space-y-8">
-              <div className="text-center">
-                <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-4">
-                  Friends just like you
+              <div className="text-center space-y-4">
+                <h1 className="text-4xl md:text-5xl font-black tracking-tight">
+                  Find your <span className="text-[#fec400]">community</span>
                 </h1>
-                <p className="text-white/70 text-lg">
-                  Connect with other fans who love the same idols
+                <p className="text-muted-foreground text-lg">
+                  Connect with fans who share your interests
                 </p>
               </div>
 
               {suggestedFriends.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                   {suggestedFriends.map((friend, index) => (
                     <Card 
                       key={friend.id}
                       className={cn(
-                        "backdrop-blur-xl border-white/20 cursor-pointer transition-all duration-300 transform hover:scale-105",
+                        "cursor-pointer transition-all duration-300 hover:shadow-lg",
                         selectedFriends.includes(friend.id) 
-                          ? "bg-gradient-to-r from-cyan-500/30 to-blue-500/30 border-cyan-400/50" 
-                          : "bg-white/10 hover:bg-white/20",
+                          ? "border-[#fec400] bg-[#fec400]/5" 
+                          : "border-border/50 hover:border-[#fec400]/40",
                         "animate-fade-in-up"
                       )}
                       style={{ animationDelay: `${index * 50}ms` }}
                       onClick={() => handleFriendToggle(friend.id)}
                     >
-                      <CardContent className="p-4 text-center">
-                        <div className="relative mb-3">
-                          <img 
-                            src={friend.avatar} 
-                            alt={friend.name}
-                            className="w-16 h-16 rounded-full mx-auto object-cover"
-                          />
-                          {selectedFriends.includes(friend.id) && (
-                            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center">
-                              <Check className="w-3 h-3 text-white" />
-                            </div>
-                          )}
+                      <CardContent className="p-4">
+                        <div className="space-y-3">
+                          <div className="relative">
+                            <img 
+                              src={friend.avatar} 
+                              alt={friend.name}
+                              className="w-full aspect-square rounded-full object-cover"
+                            />
+                            {selectedFriends.includes(friend.id) && (
+                              <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#fec400] rounded-full flex items-center justify-center">
+                                <Check className="w-3 h-3 text-black" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-center">
+                            <h3 className="font-semibold text-sm truncate">{friend.name}</h3>
+                            <p className="text-xs text-muted-foreground truncate">
+                              @{friend.username}
+                            </p>
+                          </div>
                         </div>
-                        <h3 className="text-white font-semibold text-sm mb-1">
-                          {friend.name}
-                        </h3>
-                        <p className="text-white/60 text-xs">
-                          @{friend.username}
-                        </p>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <Users className="w-16 h-16 text-white/40 mx-auto mb-4" />
-                  <p className="text-white/60">
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-muted-foreground">
                     No suggested friends found. You can always find friends later!
                   </p>
                 </div>
               )}
-
-              <div className="flex justify-between items-center">
-                <Button 
-                  onClick={handleBack}
-                  variant="ghost"
-                  className="text-white/70 hover:text-white hover:bg-white/10"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back
-                </Button>
-                
-                <Button 
-                  onClick={handleComplete}
-                  disabled={loading}
-                  className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-8"
-                >
-                  {loading ? "Setting up..." : "Complete Setup"}
-                  {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
-                </Button>
-              </div>
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom navigation-style controls */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t border-[#fec400]/40">
+        <div className="flex items-center justify-between px-4 py-4">
+          {step > 1 ? (
+            <Button 
+              onClick={handleBack}
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Button>
+          ) : (
+            <div />
+          )}
+          
+          {step < 3 ? (
+            <Button 
+              onClick={step === 1 ? undefined : handleNext}
+              disabled={step === 2 && selectedIdols.length === 0}
+              variant={step === 1 ? "ghost" : "default"}
+              size="sm"
+              className={cn(
+                "flex items-center gap-2",
+                step !== 1 && "bg-[#fec400] hover:bg-[#fec400]/90 text-black"
+              )}
+            >
+              {step === 1 ? (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  Get Started
+                </>
+              ) : (
+                <>
+                  Next
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleComplete}
+              disabled={loading}
+              size="sm"
+              className="bg-[#fec400] hover:bg-[#fec400]/90 text-black flex items-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 animate-spin rounded-full border-2 border-black border-t-transparent" />
+                  Setting up...
+                </>
+              ) : (
+                <>
+                  Complete
+                  <Check className="w-4 h-4" />
+                </>
+              )}
+            </Button>
           )}
         </div>
       </div>
