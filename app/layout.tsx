@@ -92,6 +92,15 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const publicRoutes = ['/auth', '/landing', '/about', '/terms', '/privacy']
   const isPublicRoute = publicRoutes.includes(pathname)
 
+
+
+
+
+
+  const idolRoutes = ['/idol']
+  const isIdolRoute = idolRoutes.includes(pathname)
+  
+  
   useEffect(() => {
     if (!loading && !user && !isPublicRoute) {
       router.push('/auth')
@@ -99,7 +108,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [user, loading, pathname, router, isPublicRoute])
 
   // Show loading spinner while checking authentication
-  if (loading) {
+  if (loading && !isIdolRoute) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
