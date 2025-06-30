@@ -3,10 +3,12 @@
 export interface Idol {
   id: string
   name: string
+  slug?: string
   image: string
   category: string
   stans: number
   isStanned?: boolean
+  videoUrl?: string
 }
 
 export interface User {
@@ -130,4 +132,4 @@ export interface ProfileData {
   collections: Collection[]
   favorites: UserFavorite[]
   stannedIdolsCount: number
-}
+  }
