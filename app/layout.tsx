@@ -12,6 +12,13 @@ import { FloatingNavButton } from "@/components/floating-nav-button"
 import { AuthProvider, useAuth } from "@/hooks/use-auth"
 import { Toaster } from "sonner"
 import { Loader2 } from "lucide-react"
+import { Lobster } from "next/font/google"
+
+const lobster = Lobster({
+  subsets: ["latin"],
+  weight: "400", // adjust as needed
+  display: "swap", // optional
+})
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -39,7 +46,7 @@ function Header() {
   return (
     <header className="w-full bg-white border-b border-gray-100 shadow-sm">
       <div className="flex justify-center items-center py-3">
-        <h1 className="text-3xl font-bold tracking-wide" style={{ fontFamily: 'Lobster' }}>
+        <h1 className={`text-3xl font-bold tracking-wide ${lobster.className}`}>
           <span 
             className="bg-clip-text text-transparent"
             style={{ 
@@ -157,12 +164,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link 
-          href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" 
-          rel="stylesheet" 
-        />
+        
       </head>
       <body className={inter.className}>
         <LayoutContent>
