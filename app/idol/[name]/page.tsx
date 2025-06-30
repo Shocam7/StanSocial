@@ -21,7 +21,7 @@ const sampleIdols: Idol[] = [
     category: "Music",
     stans: 1200000,
     isStanned: true,
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    videoUrl: "https://7vfknjtmqkepip1x.public.blob.vercel-storage.com/bts.mp4",
   },
   {
     id: "2",
@@ -31,7 +31,7 @@ const sampleIdols: Idol[] = [
     category: "K-Pop",
     stans: 2500000,
     isStanned: true,
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    videoUrl: "https://7vfknjtmqkepip1x.public.blob.vercel-storage.com/bts.mp4",
   },
   {
     id: "3",
