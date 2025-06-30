@@ -15,6 +15,60 @@ import { Loader2 } from "lucide-react"
 
 const inter = Inter({ subsets: ["latin"] })
 
+// Header Component
+function Header() {
+  // Generate a random gradient between green and purple for "Intere"
+  const generateRandomGradient = () => {
+    const greenHues = [120, 140, 160]; // Green spectrum
+    const purpleHues = [280, 300, 320]; // Purple spectrum
+    
+    const hue1 = greenHues[Math.floor(Math.random() * greenHues.length)];
+    const hue2 = purpleHues[Math.floor(Math.random() * purpleHues.length)];
+    
+    return `linear-gradient(135deg, hsl(${hue1}, 70%, 50%), hsl(${hue2}, 70%, 50%))`;
+  };
+
+  // Generate fusion gradient for "st" (blending the green-purple with #fec400)
+  const generateFusionGradient = () => {
+    return `linear-gradient(135deg, hsl(280, 70%, 50%), #fec400, hsl(140, 70%, 50%))`;
+  };
+
+  const intereGradient = generateRandomGradient();
+  const stGradient = generateFusionGradient();
+
+  return (
+    <header className="w-full bg-white border-b border-gray-100 shadow-sm">
+      <div className="flex justify-center items-center py-3">
+        <h1 className="text-3xl font-bold tracking-wide" style={{ fontFamily: 'Lobster' }}>
+          <span 
+            className="bg-clip-text text-transparent"
+            style={{ 
+              background: intereGradient,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}
+          >
+            Intere
+          </span>
+          <span 
+            className="bg-clip-text text-transparent"
+            style={{ 
+              background: stGradient,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}
+          >
+            st
+          </span>
+          <span style={{ color: '#fec400' }}>
+            an
+          </span>
+        </h1>
+      </div>
+    </header>
+  );
+}
+
 // Since we're using "use client", we need to handle metadata differently
 // This would typically be in a separate server component or moved to page level
 
@@ -71,13 +125,20 @@ function LayoutContent({ children }: RootLayoutProps) {
   // Hide mobile nav on specific pages
   const hideNavRoutes = ['/me', '/auth', '/onboarding']
   const showMobileNav = !hideNavRoutes.includes(pathname)
+  
+  // Hide header on specific pages (you can customize this list)
+  const hideHeaderRoutes = ['/auth', '/onboarding']
+  const showHeader = !hideHeaderRoutes.includes(pathname)
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <AuthProvider>
         <AuthGuard>
           <div className="relative min-h-screen flex flex-col">
-            {children}
+            {showHeader && <Header />}
+            <main className="flex-1">
+              {children}
+            </main>
             {showMobileNav && (
               <>
                 <MobileNav />
@@ -95,6 +156,14 @@ function LayoutContent({ children }: RootLayoutProps) {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link 
+          href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" 
+          rel="stylesheet" 
+        />
+      </head>
       <body className={inter.className}>
         <LayoutContent>
           {children}
@@ -102,4 +171,4 @@ export default function RootLayout({ children }: RootLayoutProps) {
       </body>
     </html>
   )
-}
+    }
