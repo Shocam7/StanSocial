@@ -31,7 +31,7 @@ const sampleIdols: Idol[] = [
     category: "K-Pop",
     stans: 2500000,
     isStanned: true,
-    videoUrl: "https://github.com/Shocam7/Stan/blob/d61d5eeced65aa5c0cf050530ef7957a9dbe8f7d/videoplayback.mp4",
+    videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
   },
   {
     id: "3",
@@ -161,6 +161,7 @@ export default async function IdolPage({ params }: IdolPageProps) {
   const [showSplash, setShowSplash] = useState(true)
   const [videoEnded, setVideoEnded] = useState(false)
   const [crackAnimation, setCrackAnimation] = useState(false)
+  const [videoError, setVideoError] = useState(false)
 
   // Find the idol by slug (converted from name)
   const idol = sampleIdols.find((i) => i.slug === name || nameToSlug(i.name) === name)
@@ -220,23 +221,29 @@ export default async function IdolPage({ params }: IdolPageProps) {
             autoPlay
             muted
             onEnded={handleVideoEnd}
-            onError={() => {
-              // Fallback if video fails to load
-              setTimeout(() => {
-                setCrackAnimation(true)
-                setTimeout(() => setShowSplash(false), 1000)
-              }, 3000)
+            onError={(e) => {
+              console.log("Video failed to load:", e)
+              setVideoError(true)
+              // Fallback if video fails to load - show fallback immediately
+              setCrackAnimation(true)
+              setTimeout(() => setShowSplash(false), 1000)
             }}
+            onLoadStart={() => console.log("Video loading started")}
+            onCanPlay={() => console.log("Video can play")}
           >
             <source src={idol.videoUrl} type="video/mp4" />
-            {/* Fallback content */}
+            {/* This fallback won't show in video element, moved outside */}
+          </video>
+
+          {/* Fallback content for when video fails */}
+          {videoError && (
             <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
               <div className="text-center text-white">
                 <h1 className="text-6xl font-bold mb-4 animate-pulse">{idol.name}</h1>
                 <p className="text-xl opacity-75">Loading amazing content...</p>
               </div>
             </div>
-          </video>
+          )}
 
           {/* Overlay with idol name */}
           <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
