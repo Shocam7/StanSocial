@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { Idol, Post as PostType } from "@/types"
 import { FloatingNavButton } from "@/components/floating-nav-button"
 
-// Sample data (in a real app, this would come from an API)
+// Sample data with working video URLs
 const sampleIdols: Idol[] = [
   {
     id: "1",
@@ -21,7 +21,7 @@ const sampleIdols: Idol[] = [
     category: "Music",
     stans: 1200000,
     isStanned: true,
-    videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
   },
   {
     id: "2",
@@ -31,7 +31,7 @@ const sampleIdols: Idol[] = [
     category: "K-Pop",
     stans: 2500000,
     isStanned: true,
-    videoUrl: "https://7vfknjtmqkepip1x.public.blob.vercel-storage.com/bts.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
   },
   {
     id: "3",
@@ -41,7 +41,7 @@ const sampleIdols: Idol[] = [
     category: "Acting",
     stans: 980000,
     isStanned: false,
-    videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_5mb.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
   },
   {
     id: "4",
@@ -51,7 +51,7 @@ const sampleIdols: Idol[] = [
     category: "K-Pop",
     stans: 1800000,
     isStanned: false,
-    videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
   },
   {
     id: "5",
@@ -61,7 +61,7 @@ const sampleIdols: Idol[] = [
     category: "Acting",
     stans: 850000,
     isStanned: false,
-    videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
   },
   {
     id: "6",
@@ -71,7 +71,7 @@ const sampleIdols: Idol[] = [
     category: "Music",
     stans: 1500000,
     isStanned: true,
-    videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_5mb.mp4",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
   },
 ]
 
@@ -88,7 +88,17 @@ const samplePosts: PostType[] = [
     user: { name: "Sarah Johnson", username: "sarahj_fan", avatar: "/placeholder.svg?height=24&width=24" },
     idol: sampleIdols[0],
   },
-  // ... other posts remain the same
+  {
+    id: "2",
+    content: "BTS just dropped some amazing content! Army forever! 💜",
+    timestamp: "4h",
+    likes: 512,
+    comments: 78,
+    reposts: 45,
+    liked: false,
+    user: { name: "Kpop Stan", username: "kpop_lover", avatar: "/placeholder.svg?height=24&width=24" },
+    idol: sampleIdols[1],
+  },
 ]
 
 interface IdolPageProps {
@@ -102,13 +112,12 @@ function nameToSlug(name: string): string {
 export default async function IdolPage({ params }: IdolPageProps) {
   const { name } = await params
   
-  // DEBUG: Add console logs
   console.log('IdolPage rendering with name:', name)
   
   const [showSplash, setShowSplash] = useState(true)
-  const [videoEnded, setVideoEnded] = useState(false)
-  const [crackAnimation, setCrackAnimation] = useState(false)
+  const [videoLoaded, setVideoLoaded] = useState(false)
   const [videoError, setVideoError] = useState(false)
+  const [crackAnimation, setCrackAnimation] = useState(false)
 
   // Find the idol by slug
   const idol = sampleIdols.find((i) => i.slug === name || nameToSlug(i.name) === name)
@@ -137,30 +146,32 @@ export default async function IdolPage({ params }: IdolPageProps) {
     { type: "popular", content: "Most discussed idol this week", timestamp: "5d" },
   ]
 
+  // Single effect to handle splash screen timing
   useEffect(() => {
-    console.log('Splash screen useEffect running')
+    console.log('Setting up splash screen timer')
     
-    // REDUCED timeout to 3 seconds for debugging
     const timer = setTimeout(() => {
-      console.log('Timer fired - hiding splash screen')
-      if (!videoEnded) {
-        setCrackAnimation(true)
-        setTimeout(() => {
-          console.log('Setting showSplash to false')
-          setShowSplash(false)
-        }, 500) // Reduced animation time
-      }
-    }, 3000) // Reduced from 10 seconds
+      console.log('Timer fired - starting exit animation')
+      setCrackAnimation(true)
+      setTimeout(() => {
+        console.log('Hiding splash screen')
+        setShowSplash(false)
+      }, 500)
+    }, 5000) // 5 seconds total
 
     return () => {
-      console.log('Cleaning up timer')
+      console.log('Cleaning up splash timer')
       clearTimeout(timer)
     }
-  }, [videoEnded])
+  }, [])
+
+  const handleVideoLoad = () => {
+    console.log('Video loaded successfully')
+    setVideoLoaded(true)
+  }
 
   const handleVideoEnd = () => {
-    console.log('Video ended')
-    setVideoEnded(true)
+    console.log('Video ended naturally')
     setCrackAnimation(true)
     setTimeout(() => setShowSplash(false), 500)
   }
@@ -174,60 +185,61 @@ export default async function IdolPage({ params }: IdolPageProps) {
   const handleVideoError = (e: any) => {
     console.log("Video failed to load:", e)
     setVideoError(true)
-    // Immediately hide splash on video error
-    setShowSplash(false)
+    // Show fallback content but keep splash screen
   }
 
-  // TEMPORARY: Skip splash screen entirely for debugging
-  // Remove this after testing
-  useEffect(() => {
-    const skipSplash = setTimeout(() => {
-      console.log('Force skipping splash screen for debugging')
-      setShowSplash(false)
-    }, 1000)
-    
-    return () => clearTimeout(skipSplash)
-  }, [])
-
-  console.log('Render state:', { showSplash, videoEnded, crackAnimation, videoError })
+  console.log('Render state:', { showSplash, videoLoaded, videoError, crackAnimation })
 
   if (showSplash) {
     return (
       <div className="fixed inset-0 z-50 bg-black">
-        <div className={`relative w-full h-full overflow-hidden ${crackAnimation ? 'animate-crack-open' : ''}`}>
-          <video
-            className="w-full h-full object-cover"
-            autoPlay
-            muted
-            onEnded={handleVideoEnd}
-            onError={handleVideoError}
-            onLoadStart={() => console.log("Video loading started")}
-            onCanPlay={() => console.log("Video can play")}
-          >
-            <source src={idol.videoUrl} type="video/mp4" />
-          </video>
+        <div className={`relative w-full h-full overflow-hidden transition-all duration-500 ${
+          crackAnimation ? 'scale-110 opacity-0' : 'scale-100 opacity-100'
+        }`}>
+          {/* Video element */}
+          {!videoError && (
+            <video
+              className="w-full h-full object-cover"
+              autoPlay
+              muted
+              playsInline
+              onLoadedData={handleVideoLoad}
+              onEnded={handleVideoEnd}
+              onError={handleVideoError}
+              onLoadStart={() => console.log("Video loading started")}
+              onCanPlay={() => console.log("Video can play")}
+            >
+              <source src={idol.videoUrl} type="video/mp4" />
+            </video>
+          )}
 
-          {/* Fallback content for when video fails */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+          {/* Fallback content - always present but conditionally visible */}
+          <div className={`absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center transition-opacity duration-300 ${
+            videoError || !videoLoaded ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}>
             <div className="text-center text-white">
               <h1 className="text-6xl font-bold mb-4 animate-pulse">{idol.name}</h1>
-              <p className="text-xl opacity-75">Loading amazing content...</p>
-              <button 
-                onClick={handleSkip}
-                className="mt-4 bg-white bg-opacity-20 text-white px-6 py-2 rounded-full hover:bg-opacity-30 transition-all duration-300"
-              >
-                Continue to Page
-              </button>
+              <p className="text-xl opacity-75 mb-6">
+                {videoError ? 'Welcome to the experience!' : 'Loading amazing content...'}
+              </p>
+              <div className="w-16 h-1 bg-white bg-opacity-30 rounded-full mx-auto mb-6">
+                <div className="h-full bg-white rounded-full animate-pulse" style={{ width: '60%' }}></div>
+              </div>
             </div>
           </div>
 
           {/* Skip button */}
           <button
             onClick={handleSkip}
-            className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full hover:bg-opacity-70 transition-all duration-300 text-sm z-10"
+            className="absolute top-6 right-6 bg-black bg-opacity-50 text-white px-6 py-3 rounded-full hover:bg-opacity-70 transition-all duration-300 text-sm z-20 backdrop-blur-sm"
           >
             Skip
           </button>
+
+          {/* Progress indicator */}
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-white text-sm opacity-60">
+            Loading {idol.name}'s profile...
+          </div>
         </div>
       </div>
     )
@@ -365,4 +377,4 @@ export default async function IdolPage({ params }: IdolPageProps) {
       </div>
     </div>
   )
-}
+  }
