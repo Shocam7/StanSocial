@@ -31,7 +31,7 @@ const sampleIdols: Idol[] = [
     category: "K-Pop",
     stans: 2500000,
     isStanned: true,
-    videoUrl: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
+    videoUrl: "https://7vfknjtmqkepip1x.public.blob.vercel-storage.com/bts.mp4",
   },
   {
     id: "3",
