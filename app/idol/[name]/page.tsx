@@ -31,7 +31,7 @@ const sampleIdols: Idol[] = [
     category: "K-Pop",
     stans: 2500000,
     isStanned: true,
-    videoUrl: "https://rr4---sn-gwpa-a3ve6.googlevideo.com/videoplayback?expire=1751320201&ei=KbJiaKWZLtLm6dsPkLq6sAw&ip=85.209.123.237&id=o-ANaWj5Ug91wkSurDPJl2xjhT4SxOnL5ysrXCmO8BGVwK&itag=18&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&rms=au%2Cau&siu=1&bui=AY1jyLNqy_lIxaiPnDI_a4lVQ_dqPnrbc1VTZWutmgns2TzzMLvr5V3-LjF_QS-7cMuW3aYWlg&spc=l3OVKSWHChkfVEbab4DE&vprv=1&svpuc=1&mime=video%2Fmp4&ns=7r51Lgcv1MgZFAdhT7fDOPwQ&rqh=1&gir=yes&clen=1257933&ratebypass=yes&dur=15.317&lmt=1734233337721816&c=TVHTML5_SIMPLY_EMBEDDED_PLAYER&sefc=1&txp=5530434&n=wI5aA9lbl9yCEg&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Csiu%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Crqh%2Cgir%2Cclen%2Cratebypass%2Cdur%2Clmt&sig=AJfQdSswRAIgJ6ozB4nm9eaki7TF452kTMOZt02IElURLdnHk674tosCIDoMuqKuIfNf8RoONI4nIyYbIx-T5Cnrd1vzjLl61P0F&title=When+RM+And+Jimin+Accidentally+Ripped+Their+Shirts+Off+On+Stage+%F0%9F%A4%A3%F0%9F%A4%A3+%23shorts+%23rm+%23jimin+%23bts&redirect_counter=1&rm=sn-25grr7l&rrc=104&fexp=24350590,24350737,24350827,24350961,24351316,24351318,24351528,24351907,24352102,24352220,24352236,24352321,24352334,24352336,24352394,24352396,24352447,24352456,24352466&req_id=fd7362d99e22a3ee&cms_redirect=yes&ipbypass=yes&met=1751298608,&mh=lx&mip=2405:201:601d:d801:49d9:4f6:f63d:2d6f&mm=31&mn=sn-gwpa-a3ve6&ms=au&mt=1751298086&mv=m&mvi=4&pl=49&lsparams=ipbypass,met,mh,mip,mm,mn,ms,mv,mvi,pl,rms&lsig=APaTxxMwRQIgSkLkc8pYMx-JSB3VuqSupwUT8kWb9eHZIqUJeSfMSCECIQCGZE8MdiXZNyvKS44GNCZ2wKZqTshyTQ5Qr4hZRk9pLw%3D%3D",
+    videoUrl: "https://github.com/Shocam7/Stan/blob/d61d5eeced65aa5c0cf050530ef7957a9dbe8f7d/videoplayback.mp4",
   },
   {
     id: "3",
