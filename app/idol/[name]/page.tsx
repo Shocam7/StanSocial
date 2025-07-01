@@ -1,7 +1,6 @@
 "use client"
 
 import { notFound } from "next/navigation"
-import { useState, useEffect } from "react"
 import { Header } from "@/components/header"
 import { StannedIdolsSidebar } from "@/components/stanned-idols-sidebar"
 import { Post } from "@/components/post"
@@ -11,67 +10,55 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { Idol, Post as PostType } from "@/types"
 import { FloatingNavButton } from "@/components/floating-nav-button"
 
-// Sample data with working video URLs
+// Sample data (in a real app, this would come from an API)
 const sampleIdols: Idol[] = [
   {
     id: "1",
     name: "Taylor Swift",
-    slug: "taylor-swift",
     image: "/placeholder.svg?height=120&width=120&text=TS",
     category: "Music",
     stans: 1200000,
     isStanned: true,
-    videoUrl: "https://7vfknjtmqkepip1x.public.blob.vercel-storage.com/bts.mp4",
   },
   {
     id: "2",
     name: "BTS",
-    slug: "bts",
     image: "/placeholder.svg?height=120&width=120&text=BTS",
     category: "K-Pop",
     stans: 2500000,
     isStanned: true,
-    videoUrl: "https://7vfknjtmqkepip1x.public.blob.vercel-storage.com/bts.mp4",
   },
   {
     id: "3",
     name: "Zendaya",
-    slug: "zendaya",
     image: "/placeholder.svg?height=120&width=120&text=Z",
     category: "Acting",
     stans: 980000,
     isStanned: false,
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
   },
   {
     id: "4",
     name: "Blackpink",
-    slug: "blackpink",
     image: "/placeholder.svg?height=120&width=120&text=BP",
     category: "K-Pop",
     stans: 1800000,
     isStanned: false,
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
   },
   {
     id: "5",
     name: "Tom Holland",
-    slug: "tom-holland",
     image: "/placeholder.svg?height=120&width=120&text=TH",
     category: "Acting",
     stans: 850000,
     isStanned: false,
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
   },
   {
     id: "6",
     name: "Ariana Grande",
-    slug: "ariana-grande",
     image: "/placeholder.svg?height=120&width=120&text=AG",
     category: "Music",
     stans: 1500000,
     isStanned: true,
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
   },
 ]
 
@@ -90,42 +77,74 @@ const samplePosts: PostType[] = [
   },
   {
     id: "2",
-    content: "BTS just dropped some amazing content! Army forever! 💜",
+    content:
+      "Taylor's surprise acoustic set at the end of the concert last night was magical. She played 'All Too Well' (10 minute version) and I was in tears. Best night ever! ❤️",
+    image: "/placeholder.svg?height=300&width=500&text=Concert+Moment",
+    timestamp: "12h",
+    likes: 892,
+    comments: 76,
+    reposts: 41,
+    user: { name: "David Kim", username: "david_swiftie", avatar: "/placeholder.svg?height=24&width=24" },
+    idol: sampleIdols[0],
+  },
+  {
+    id: "3",
+    content:
+      "The way Taylor writes about heartbreak is unmatched. Every lyric hits different when you're going through it yourself. Her music is therapy.",
+    timestamp: "1d",
+    likes: 567,
+    comments: 89,
+    reposts: 23,
+    user: { name: "Emma Wilson", username: "emma_swiftie", avatar: "/placeholder.svg?height=24&width=24" },
+    idol: sampleIdols[0],
+  },
+  {
+    id: "4",
+    content:
+      "BTS just announced their world tour! Who's trying to get tickets? I'm already saving up for the VIP experience! 💜",
+    image: "/placeholder.svg?height=300&width=500&text=BTS+World+Tour",
     timestamp: "4h",
-    likes: 512,
-    comments: 78,
-    reposts: 45,
-    liked: false,
-    user: { name: "Kpop Stan", username: "kpop_lover", avatar: "/placeholder.svg?height=24&width=24" },
+    likes: 1024,
+    comments: 156,
+    reposts: 87,
+    user: { name: "Alex Chen", username: "alexbtstan", avatar: "/placeholder.svg?height=24&width=24" },
     idol: sampleIdols[1],
+  },
+  {
+    id: "5",
+    content:
+      "The choreography in BTS's new music video is mind-blowing. They never disappoint with their performances. I've been trying to learn it all day!",
+    timestamp: "1d",
+    likes: 1456,
+    comments: 203,
+    reposts: 178,
+    user: { name: "Emma Wilson", username: "emma_btsarmy", avatar: "/placeholder.svg?height=24&width=24" },
+    idol: sampleIdols[1],
+  },
+  {
+    id: "6",
+    content:
+      "Ariana's vocals in her latest album are absolutely insane. The range, the control, the emotion... she's truly one of the best vocalists of our generation.",
+    timestamp: "6h",
+    likes: 578,
+    comments: 43,
+    reposts: 29,
+    user: { name: "Maria Rodriguez", username: "maria_arianator", avatar: "/placeholder.svg?height=24&width=24" },
+    idol: sampleIdols[5],
   },
 ]
 
 interface IdolPageProps {
-  params: Promise<{ name: string }>
-}
-
-function nameToSlug(name: string): string {
-  return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+  params: Promise<{ id: string }>
 }
 
 export default async function IdolPage({ params }: IdolPageProps) {
-  const { name } = await params
-  
-  console.log('IdolPage rendering with name:', name)
-  
-  const [showSplash, setShowSplash] = useState(true)
-  const [videoLoaded, setVideoLoaded] = useState(false)
-  const [videoError, setVideoError] = useState(false)
-  const [crackAnimation, setCrackAnimation] = useState(false)
+  const { id } = await params
 
-  // Find the idol by slug
-  const idol = sampleIdols.find((i) => i.slug === name || nameToSlug(i.name) === name)
-  
-  console.log('Found idol:', idol)
+  // Find the idol by ID
+  const idol = sampleIdols.find((i) => i.id === id)
 
   if (!idol) {
-    console.log('Idol not found, calling notFound()')
     notFound()
   }
 
@@ -140,113 +159,15 @@ export default async function IdolPage({ params }: IdolPageProps) {
 
   const stannedIdols = sampleIdols.filter((idol) => idol.isStanned)
 
+  // Sample recent activity data
   const recentActivity = [
     { type: "milestone", content: `Reached ${idol.stans.toLocaleString()} stans!`, timestamp: "2d" },
     { type: "trending", content: "Trending in Music category", timestamp: "3d" },
     { type: "popular", content: "Most discussed idol this week", timestamp: "5d" },
   ]
 
-  // Single effect to handle splash screen timing
-  useEffect(() => {
-    console.log('Setting up splash screen timer')
-    
-    const timer = setTimeout(() => {
-      console.log('Timer fired - starting exit animation')
-      setCrackAnimation(true)
-      setTimeout(() => {
-        console.log('Hiding splash screen')
-        setShowSplash(false)
-      }, 500)
-    }, 5000) // 5 seconds total
-
-    return () => {
-      console.log('Cleaning up splash timer')
-      clearTimeout(timer)
-    }
-  }, [])
-
-  const handleVideoLoad = () => {
-    console.log('Video loaded successfully')
-    setVideoLoaded(true)
-  }
-
-  const handleVideoEnd = () => {
-    console.log('Video ended naturally')
-    setCrackAnimation(true)
-    setTimeout(() => setShowSplash(false), 500)
-  }
-
-  const handleSkip = () => {
-    console.log('Skip button clicked')
-    setCrackAnimation(true)
-    setTimeout(() => setShowSplash(false), 500)
-  }
-
-  const handleVideoError = (e: any) => {
-    console.log("Video failed to load:", e)
-    setVideoError(true)
-    // Show fallback content but keep splash screen
-  }
-
-  console.log('Render state:', { showSplash, videoLoaded, videoError, crackAnimation })
-
-  if (showSplash) {
-    return (
-      <div className="fixed inset-0 z-50 bg-black">
-        <div className={`relative w-full h-full overflow-hidden transition-all duration-500 ${
-          crackAnimation ? 'scale-110 opacity-0' : 'scale-100 opacity-100'
-        }`}>
-          {/* Video element */}
-          {!videoError && (
-            <video
-              className="w-full h-full object-cover"
-              autoPlay
-              muted
-              playsInline
-              onLoadedData={handleVideoLoad}
-              onEnded={handleVideoEnd}
-              onError={handleVideoError}
-              onLoadStart={() => console.log("Video loading started")}
-              onCanPlay={() => console.log("Video can play")}
-            >
-              <source src={idol.videoUrl} type="video/mp4" />
-            </video>
-          )}
-
-          {/* Fallback content - always present but conditionally visible */}
-          <div className={`absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center transition-opacity duration-300 ${
-            videoError || !videoLoaded ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}>
-            <div className="text-center text-white">
-              <h1 className="text-6xl font-bold mb-4 animate-pulse">{idol.name}</h1>
-              <p className="text-xl opacity-75 mb-6">
-                {videoError ? 'Welcome to the experience!' : 'Loading amazing content...'}
-              </p>
-              <div className="w-16 h-1 bg-white bg-opacity-30 rounded-full mx-auto mb-6">
-                <div className="h-full bg-white rounded-full animate-pulse" style={{ width: '60%' }}></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Skip button */}
-          <button
-            onClick={handleSkip}
-            className="absolute top-6 right-6 bg-black bg-opacity-50 text-white px-6 py-3 rounded-full hover:bg-opacity-70 transition-all duration-300 text-sm z-20 backdrop-blur-sm"
-          >
-            Skip
-          </button>
-
-          {/* Progress indicator */}
-          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-white text-sm opacity-60">
-            Loading {idol.name}'s profile...
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-background animate-fade-in">
+    <div className="min-h-screen bg-background">
       <FloatingNavButton />
       <Header />
 
@@ -377,4 +298,4 @@ export default async function IdolPage({ params }: IdolPageProps) {
       </div>
     </div>
   )
-  }
+}
